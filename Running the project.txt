@@ -1,0 +1,5 @@
+# In the frontend folder
+npm run dev
+
+# In the backend folder
+php artisan serve

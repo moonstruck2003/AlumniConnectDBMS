@@ -1,0 +1,11 @@
+# Download the composer executable
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+
+# Create the Laravel project
+php composer.phar create-project laravel/laravel backend
+
+# Generate the application key (usually automatic, but good to know)
+cd backend
+php artisan key:generate

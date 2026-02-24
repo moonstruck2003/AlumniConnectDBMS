@@ -1,0 +1,6 @@
+# Create the Vite React app
+npm create vite@latest frontend -- --template react
+# Navigate and install dependencies
+cd frontend
+npm install
+npm install axios react-router-dom tailwindcss @tailwindcss/postcss postcss autoprefixer
