@@ -1,9 +1,11 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/navbar';
 import Hero from './components/welcome';
 import StatCard from './components/StatCard';
+import Login from './pages/Login';
 
-function App() {
+function Home() {
   const stats = [
     { label: "Total Alumni", value: "12,450", growth: "+5.2%" },
     { label: "Active Mentors", value: "842", growth: "+12.4%" },
@@ -34,4 +36,16 @@ function App() {
     </div>
   );
 }
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
 export default App;
