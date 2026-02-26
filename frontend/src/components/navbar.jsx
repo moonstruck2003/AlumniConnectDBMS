@@ -20,7 +20,7 @@ export default function Navbar() {
       </ul>
       <div className="nav-actions">
         <Link to="/login" className="nav-login-link">Already Registered? <strong>Login</strong></Link>
-        <button className="nav-btn">Sign up with email</button>
+        <Link to="/signup" className="nav-btn">Sign up with email</Link>
       </div>
     </nav>
   );

@@ -3,7 +3,9 @@ import './App.css';
 import Navbar from './components/navbar';
 import Hero from './components/welcome';
 import StatCard from './components/StatCard';
+
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 function Home() {
   const stats = [
@@ -43,6 +45,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </BrowserRouter>
   );
