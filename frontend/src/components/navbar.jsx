@@ -12,11 +12,11 @@ export default function Navbar() {
         </div>
       </div>
       <ul className="nav-links">
-        <li className="active">Dashboard</li>
-        <li>Alumni Directory</li>
-        <li>Mentorship</li>
-        <li>Jobs & Internships</li>
-        <li>Events</li>
+        <li><Link to="/">Dashboard</Link></li>
+        <li><Link to="/alumnidirectory">Alumni Directory</Link></li>
+        <li><Link to="/mentorship">Mentorship</Link></li>
+        <li><Link to="/jobs">Jobs & Internships</Link></li>
+        <li><Link to="/events">Events</Link></li>
       </ul>
       <div className="nav-actions">
         <Link to="/login" className="nav-login-link">Already Registered? <strong>Login</strong></Link>
