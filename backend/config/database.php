@@ -99,19 +99,20 @@ return [
         ],
 
         'sqlsrv' => [
-            'driver' => 'sqlsrv',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => env('DB_CHARSET', 'utf8'),
-            'prefix' => '',
-            'prefix_indexes' => true,
-            // 'encrypt' => env('DB_ENCRYPT', 'yes'),
-            // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
-        ],
+    'driver' => 'sqlsrv',
+    'url' => env('DB_URL'),
+    'host' => env('DB_HOST', 'db'), // Using 'db' as per your docker-compose
+    'port' => env('DB_PORT', '1433'),
+    'database' => env('DB_DATABASE', 'alumni_dbms'),
+    'username' => env('DB_USERNAME', 'sa'),
+    'password' => env('DB_PASSWORD', 'root@123'),
+    'charset' => 'utf8',
+    'prefix' => '',
+    'prefix_indexes' => true,
+    // FORCE THESE SETTINGS REGARDLESS OF .ENV
+    'encrypt' => 'yes',
+    'trust_server_certificate' => true, 
+],
 
     ],
 
