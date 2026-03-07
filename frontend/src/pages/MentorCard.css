@@ -1,0 +1,150 @@
+.mentor-card {
+    background: white;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 20px;
+    transition: box-shadow 0.3s ease;
+}
+
+.mentor-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mentor-header {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.mentor-avatar {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.mentor-info {
+    flex: 1;
+}
+
+.mentor-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: #1a1a1a;
+}
+
+.mentor-title {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+}
+
+.mentor-company {
+    font-size: 12px;
+    color: #999;
+    margin: 2px 0 0;
+}
+
+.mentor-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.stat-rating {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.stat-text {
+    color: #999;
+}
+
+.slots-badge {
+    text-align: right;
+}
+
+.available {
+    background-color: #c6f6d5;
+    color: #22863a;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.fully-booked {
+    background-color: #f0f0f0;
+    color: #999;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.expertise-section {
+    margin-bottom: 16px;
+}
+
+.expertise-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.expertise-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.expertise-tag {
+    background-color: #f0f0f0;
+    color: #666;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 12px;
+}
+
+.request-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.request-btn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.request-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}

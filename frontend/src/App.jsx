@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/navbar';
@@ -6,6 +7,8 @@ import StatCard from './components/StatCard';
 
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import AlumniDirectory from './pages/AlumniDirectory';
+import Mentorship from './pages/Mentorship';
 
 function Home() {
   const stats = [
@@ -46,6 +49,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/alumnidirectory" element={<AlumniDirectory />} />
+        <Route path="/mentorship" element={<Mentorship />} />
       </Routes>
     </BrowserRouter>
   );
