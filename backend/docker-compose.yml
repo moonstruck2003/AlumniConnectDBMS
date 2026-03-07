@@ -1,0 +1,27 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: alumni_mssql
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=root@123
+    networks:
+      - app-network
+
+  app:
+    build: .
+    container_name: alumnidbms_app
+    volumes:
+      - .:/var/www/html 
+    depends_on:
+      - db
+    env_file:
+      - .env 
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
