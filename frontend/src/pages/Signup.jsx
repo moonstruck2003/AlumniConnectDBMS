@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, ArrowRight, BookOpen } from 'lucide-react';
 
@@ -8,11 +9,13 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Signup logic would be here
     console.log('Signup submitted:', { name, email, password, confirmPassword });
+    navigate('/dashboard');
   };
 
   return (
@@ -166,9 +169,9 @@ export default function Signup() {
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-600">
                 Already have an account?{' '}
-                <a href="/login" className="font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                <Link to="/login" className="font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
                   Sign in here
-                </a>
+                </Link>
               </p>
             </div>
           </motion.div>
