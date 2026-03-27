@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, BookOpen } from 'lucide-react';
 
@@ -6,22 +7,24 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Login logic would be here
     console.log('Login submitted:', { email, password });
+    navigate('/dashboard');
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4 selection:bg-blue-200">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 selection:bg-blue-200">
       
       {/* Main Container */}
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl flex overflow-hidden min-h-[600px]"
+        className="w-full max-w-5xl bg-slate-900 rounded-3xl shadow-2xl flex overflow-hidden min-h-[600px]"
       >
         
         {/* Left Side - Visual/Branding */}
@@ -51,7 +54,7 @@ export default function Login() {
               transition={{ delay: 0.3, duration: 0.6 }}
               className="flex items-center gap-3 text-white"
             >
-              <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
+              <div className="w-12 h-12 bg-slate-900/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
                 <BookOpen className="w-6 h-6 text-teal-300" />
               </div>
               <span className="text-2xl font-bold tracking-tight text-white/90">AlumniConnect</span>
@@ -75,7 +78,7 @@ export default function Login() {
         </div>
 
         {/* Right Side - Form */}
-        <div className="w-full lg:w-1/2 p-8 sm:p-16 flex flex-col justify-center bg-white">
+        <div className="w-full lg:w-1/2 p-8 sm:p-16 flex flex-col justify-center bg-slate-900">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -83,23 +86,23 @@ export default function Login() {
             className="max-w-md w-full mx-auto"
           >
             <div className="text-center lg:text-left mb-10">
-              <h3 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Welcome Back</h3>
-              <p className="text-gray-500 text-sm">Please enter your credentials to access your account.</p>
+              <h3 className="text-3xl font-bold text-white tracking-tight mb-2">Welcome Back</h3>
+              <p className="text-slate-400 text-sm">Please enter your credentials to access your account.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Input */}
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 block">Email Address</label>
+                <label className="text-sm font-semibold text-slate-300 block">Email Address</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                    <Mail className="h-5 w-5 text-slate-500 group-focus-within:text-blue-600 transition-colors" />
                   </div>
                   <input 
                     type="email" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition-all duration-200 outline-none sm:text-sm"
+                    className="block w-full pl-11 pr-4 py-3.5 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-slate-900 transition-all duration-200 outline-none sm:text-sm"
                     placeholder="you@university.edu"
                     required
                   />
@@ -109,20 +112,20 @@ export default function Login() {
               {/* Password Input */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold text-gray-700 block">Password</label>
+                  <label className="text-sm font-semibold text-slate-300 block">Password</label>
                   <a href="#" className="text-sm text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors">
                     Forgot password?
                   </a>
                 </div>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                    <Lock className="h-5 w-5 text-slate-500 group-focus-within:text-blue-600 transition-colors" />
                   </div>
                   <input 
                     type="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition-all duration-200 outline-none sm:text-sm"
+                    className="block w-full pl-11 pr-4 py-3.5 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-slate-900 transition-all duration-200 outline-none sm:text-sm"
                     placeholder="••••••••"
                     required
                   />
@@ -136,7 +139,7 @@ export default function Login() {
                 onHoverStart={() => setIsHovered(true)}
                 onHoverEnd={() => setIsHovered(false)}
                 type="submit"
-                className="w-full flex items-center justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-all duration-200 group"
+                className="w-full flex items-center justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg shadow-black/20 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-all duration-200 group"
               >
                 Sign In
                 <motion.div
@@ -150,11 +153,11 @@ export default function Login() {
             </form>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-400">
                 Don't have an account yet?{' '}
-                <a href="#" className="font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                <Link to="/signup" className="font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
                   Apply for access
-                </a>
+                </Link>
               </p>
             </div>
 

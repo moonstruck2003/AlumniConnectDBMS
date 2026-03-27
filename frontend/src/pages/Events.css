@@ -1,0 +1,76 @@
+.events-page {
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
+}
+
+.events-page input {
+  color: white;
+}
+
+.events-page::-webkit-scrollbar {
+  width: 6px;
+}
+
+.events-page::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.events-page::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+.events-page::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom selection color */
+.events-page ::selection {
+  background: rgba(245, 158, 11, 0.3);
+  color: white;
+}
+
+/* Glassmorphism 2.0 Metallic */
+.glass-panel-metallic {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel-metallic::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.05) 50%, transparent 60%);
+  transition: transform 0.8s ease-in-out;
+  transform: translateX(-100%);
+}
+
+.glass-panel-metallic:hover::after {
+  transform: translateX(100%);
+}
+
+@keyframes event-reveal {
+  from { opacity: 0; transform: scale(1.1); filter: blur(10px); }
+  to { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+.animate-event-reveal {
+  animation: event-reveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

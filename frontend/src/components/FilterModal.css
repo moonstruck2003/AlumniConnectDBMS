@@ -12,8 +12,8 @@
 }
 
 .filter-modal {
-    background: white;
-    border-radius: 12px;
+    background-color: #0f172a; /* slate-900 */
+border-radius: 12px;
     width: 90%;
     max-width: 400px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -30,7 +30,7 @@
 .modal-header h2 {
     font-size: 18px;
     margin: 0;
-    color: #1a1a1a;
+    color: #f8fafc; /* slate-50 */
 }
 
 .close-btn {
@@ -38,7 +38,7 @@
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: #999;
+    color: #64748b; /* slate-500 */
 }
 
 .modal-content {
@@ -53,18 +53,18 @@
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: #1a1a1a;
-    margin-bottom: 8px;
+    color: #f8fafc; /* slate-50 */
+margin-bottom: 8px;
 }
 
 .filter-select {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    border: 1px solid #1e293b; /* slate-800 */
+border-radius: 6px;
     font-size: 14px;
-    background-color: white;
-    cursor: pointer;
+    background-color: #0f172a; /* slate-900 */
+cursor: pointer;
 }
 
 .filter-select:focus {
@@ -105,17 +105,17 @@
 }
 
 .btn-cancel {
-    background-color: #f0f0f0;
-    color: #1a1a1a;
+    background-color: #1e293b;
+    color: #f8fafc; /* slate-50 */
 }
 
 .btn-cancel:hover {
-    background-color: #e0e0e0;
+    background-color: #1e293b;
 }
 
 .btn-apply {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+    color: #ffffff;
 }
 
 .btn-apply:hover {
