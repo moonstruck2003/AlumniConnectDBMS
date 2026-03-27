@@ -12,6 +12,8 @@ import Signup from './pages/Signup';
 import AlumniDirectory from './pages/AlumniDirectory';
 import Mentorship from './pages/Mentorship';
 import Landing from './pages/Landing';
+import Jobs from './pages/Jobs';
+import Events from './pages/Events';
 
 function Home() {
   const stats = [
@@ -132,6 +134,8 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/alumnidirectory" element={<AlumniDirectory />} />
         <Route path="/mentorship" element={<Mentorship />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/events" element={<Events />} />
       </Routes>
     </BrowserRouter>
   );
