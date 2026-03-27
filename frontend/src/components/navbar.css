@@ -3,8 +3,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.8rem 4rem;
-  background: white;
-  border-bottom: 1px solid #f0f0f0;
+  background-color: #0f172a; /* slate-900 */
+border-bottom: 1px solid #1e293b;
 }
 
 .nav-logo {
@@ -15,8 +15,8 @@
 
 .logo-icon {
   background: #7c3aed;
-  color: white;
-  padding: 8px 10px;
+  color: #ffffff;
+padding: 8px 10px;
   border-radius: 8px;
   font-weight: bold;
 }
@@ -29,12 +29,12 @@
 .logo-text {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #111827;
+  color: #f8fafc; /* slate-50 */
 }
 
 .logo-subtext {
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: #64748b; /* slate-500 */
 }
 
 .nav-links {
@@ -68,8 +68,8 @@
 
 .nav-btn {
   background: #7c3aed;
-  color: white;
-  border: none;
+  color: #ffffff;
+border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
   font-weight: 600;

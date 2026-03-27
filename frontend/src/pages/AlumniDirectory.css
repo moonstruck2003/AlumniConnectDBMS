@@ -2,15 +2,15 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #020617; /* slate-950 */
 }
 
 .alumni-directory {
     max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
-    background: white;
-    border-radius: 8px;
+    background-color: #0f172a; /* slate-900 */
+border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -19,12 +19,12 @@ body {
 }
 
 .alumni-card {
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    border: 1px solid #1e293b; /* slate-800 */
+border-radius: 5px;
     padding: 15px;
     margin-bottom: 15px;
-    background-color: #fff;
-    transition: transform 0.2s;
+    background-color: #0f172a; /* slate-900 */
+transition: transform 0.2s;
 }
 
 .alumni-card:hover {
@@ -38,7 +38,7 @@ body {
 
 .alumni-details {
     font-size: 1em;
-    color: #555;
+    color: #cbd5e1; /* slate-300 */
 }
 
 .alumni-directory-container {
@@ -55,12 +55,12 @@ body {
     font-size: 32px;
     font-weight: 600;
     margin-bottom: 8px;
-    color: #1a1a1a;
+    color: #f8fafc; /* slate-50 */
 }
 
 .alumni-directory-header p {
     font-size: 14px;
-    color: #666;
+    color: #94a3b8; /* slate-400 */
 }
 
 .alumni-directory-filters {
@@ -78,11 +78,11 @@ body {
 
 .industry-dropdown {
     padding: 10px 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    border: 1px solid #1e293b; /* slate-800 */
+border-radius: 6px;
     font-size: 14px;
-    background-color: white;
-    cursor: pointer;
+    background-color: #0f172a; /* slate-900 */
+cursor: pointer;
 }
 
 .mentor-checkbox {
@@ -99,8 +99,8 @@ body {
 
 .alumni-count {
     font-size: 13px;
-    color: #999;
-    margin-bottom: 20px;
+    color: #64748b; /* slate-500 */
+margin-bottom: 20px;
 }
 
 .alumni-grid {
@@ -128,9 +128,9 @@ body {
 }
 
 .alumni-card {
-    background: white;
-    border: 1px solid #e8e8e8;
-    border-radius: 12px;
+    background-color: #0f172a; /* slate-900 */
+border: 1px solid #1e293b; /* slate-800 */
+border-radius: 12px;
     padding: 24px;
     text-align: center;
     transition: box-shadow 0.3s ease;
@@ -153,9 +153,9 @@ body {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    display: flex;
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+    color: #ffffff;
+display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
@@ -163,8 +163,8 @@ body {
 }
 
 .mentor-badge {
-    background-color: #c6f6d5;
-    color: #22863a;
+    background-color: #064e3b;
+    color: #34d399;
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 12px;
@@ -175,13 +175,13 @@ body {
     font-size: 18px;
     font-weight: 600;
     margin: 12px 0 4px;
-    color: #1a1a1a;
+    color: #f8fafc; /* slate-50 */
 }
 
 .alumni-title {
     font-size: 14px;
-    color: #666;
-    margin-bottom: 16px;
+    color: #94a3b8; /* slate-400 */
+margin-bottom: 16px;
 }
 
 .alumni-info {
@@ -197,7 +197,7 @@ body {
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #555;
+    color: #cbd5e1; /* slate-300 */
 }
 
 .info-item .icon {
@@ -207,9 +207,9 @@ body {
 .view-profile-btn {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+    color: #ffffff;
+border: none;
     border-radius: 6px;
     font-size: 14px;
     font-weight: 600;
@@ -231,14 +231,14 @@ body {
 .search-input {
     flex: 1;
     padding: 12px 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    border: 1px solid #1e293b; /* slate-800 */
+border-radius: 6px;
     font-size: 14px;
     outline: none;
 }
 
 .search-input::placeholder {
-    color: #999;
+    color: #64748b; /* slate-500 */
 }
 
 .search-input:focus {
@@ -247,14 +247,14 @@ body {
 
 .filters-btn {
     padding: 12px 16px;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    background-color: #0f172a; /* slate-900 */
+border: 1px solid #1e293b; /* slate-800 */
+border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.3s ease;
 }
 
 .filters-btn:hover {
-    background-color: #f5f5f5;
+    background-color: #1e293b; /* slate-800 */
 }

@@ -1,8 +1,8 @@
 .card {
-  background: white;
-  padding: 1.5rem;
+  background-color: #0f172a; /* slate-900 */
+padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid #f3f4f6;
+  border: 1px solid #1e293b; /* slate-800 */
 }
 .card-header { 
     display: flex; 
@@ -24,8 +24,8 @@
 .card-body h3 { 
     font-size: 1.5rem; 
     font-weight: 800; 
-    color: #111827; 
-    margin: 0; 
+    color: #f8fafc; /* slate-50 */
+margin: 0; 
 }
 .card-body p { 
     font-size: 0.8rem; 
