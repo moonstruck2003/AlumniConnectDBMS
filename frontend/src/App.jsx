@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AlumniDirectory from './pages/AlumniDirectory';
 import Mentorship from './pages/Mentorship';
+import Landing from './pages/Landing';
 
 function Home() {
   const stats = [
@@ -46,7 +47,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/dashboard" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/alumnidirectory" element={<AlumniDirectory />} />
