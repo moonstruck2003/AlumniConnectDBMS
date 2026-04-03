@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Navbar from '../components/navbar';
+import Navbar from '../components/Navbar';
 import AlumniCard from './AlumniCard';
 import SearchFilter from './SearchFilter';
 import FilterModal from '../components/FilterModal';

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Search, Briefcase, MapPin, DollarSign, Clock, Filter, ChevronRight, Building2, Zap } from 'lucide-react';
-import Navbar from '../components/navbar';
+import Navbar from '../components/Navbar';
 import './Jobs.css';
 
 const MOCK_JOBS = [
@@ -297,10 +298,12 @@ export default function Jobs() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-4 w-full md:w-auto pt-8 md:pt-0 border-t md:border-t-0 border-slate-800/50 md:pl-10">
-                     <button className="flex-1 md:flex-none px-12 py-5 bg-white text-slate-950 hover:bg-blue-600 hover:text-white rounded-[1.8rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl hover:shadow-blue-500/30 flex items-center justify-center gap-3">
-                        Initialize
-                        <ChevronRight className="w-4 h-4" />
-                     </button>
+                     <Link to={`/jobs/details/${job.id}`} className="flex-1 md:flex-none">
+                        <button className="w-full px-12 py-5 bg-white text-slate-950 hover:bg-blue-600 hover:text-white rounded-[1.8rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl hover:shadow-blue-500/30 flex items-center justify-center gap-3">
+                           Initialize
+                           <ChevronRight className="w-4 h-4" />
+                        </button>
+                     </Link>
                   </div>
                 </motion.div>
               ))}

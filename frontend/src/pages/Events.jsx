@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Clock, Users, ArrowRight, Filter, Search, PlusCircle, Star } from 'lucide-react';
-import Navbar from '../components/navbar';
+import Navbar from '../components/Navbar';
 import './Events.css';
 
 const MOCK_EVENTS = [

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, UserCheck, Clock, BookOpen, User, ClipboardList, MessageSquare } from 'lucide-react';
-import Navbar from '../components/navbar';
+import Navbar from '../components/Navbar';
 import MentorCard from './MentorCard';
 
 const Mentorship = () => {

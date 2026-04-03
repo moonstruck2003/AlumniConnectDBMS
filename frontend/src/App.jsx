@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Activity, Zap, ArrowRight } from 'lucide-react';
+import { Activity, Zap, ArrowRight, Home as HomeIcon } from 'lucide-react';
 import './App.css';
-import Navbar from './components/navbar';
+import Navbar from './components/Navbar';
 import Hero from './components/welcome';
 import StatCard from './components/StatCard';
 
@@ -11,9 +11,16 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AlumniDirectory from './pages/AlumniDirectory';
 import Mentorship from './pages/Mentorship';
+import MentorshipRequest from './pages/MentorshipRequest';
 import Landing from './pages/Landing';
 import Jobs from './pages/Jobs';
+import JobDetails from './pages/JobDetails';
+import ApplyJob from './pages/ApplyJob';
 import Events from './pages/Events';
+import Profile from './pages/Profile';
+import Requests from './pages/Requests';
+import Conversations from './pages/Conversations';
+import Messages from './pages/Messages';
 
 function Home() {
   const stats = [
@@ -49,11 +56,8 @@ function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((item, index) => <StatCard key={index} {...item} />)}
           </div>
-
-          {/* Main Dashboard Layout */}
+ 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* Activity Panel */}
             <motion.div 
               variants={itemVariants}
               className="lg:col-span-2 p-8 bg-slate-900 border border-slate-800 rounded-[2rem] shadow-2xl relative overflow-hidden group"
@@ -76,7 +80,6 @@ function Home() {
               </div>
             </motion.div>
 
-            {/* Actions Panel */}
             <motion.div 
               variants={itemVariants}
               className="p-8 bg-slate-900 border border-slate-800 rounded-[2rem] shadow-2xl relative overflow-hidden group"
@@ -116,7 +119,6 @@ function Home() {
                 </Link>
               </div>
             </motion.div>
-
           </div>
         </motion.div>
       </main>
@@ -132,9 +134,19 @@ function App() {
         <Route path="/dashboard" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/alumnidirectory" element={<AlumniDirectory />} />
-        <Route path="/mentorship" element={<Mentorship />} />
+        
         <Route path="/jobs" element={<Jobs />} />
+        <Route path="/jobs/details/:id" element={<JobDetails />} />
+        <Route path="/jobs/apply/:id" element={<ApplyJob />} />
+        
+        <Route path="/mentorship" element={<Mentorship />} />
+        <Route path="/mentorship/request/:id" element={<MentorshipRequest />} />
+        
+        <Route path="/requests" element={<Requests />} />
+        <Route path="/conversations" element={<Conversations />} />
+        <Route path="/messages/:id" element={<Messages />} />
         <Route path="/events" element={<Events />} />
       </Routes>
     </BrowserRouter>

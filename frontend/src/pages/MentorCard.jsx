@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Star, Users, CheckCircle2, XCircle } from 'lucide-react';
 
-const MentorCard = ({ initials, name, title, company, rating, mentees, slotsAvailable, expertise }) => {
+const MentorCard = ({ id, initials, name, title, company, rating, mentees, slotsAvailable, expertise }) => {
     return (
         <motion.div 
             whileHover={{ y: -6, scale: 1.02 }}
@@ -48,16 +49,18 @@ const MentorCard = ({ initials, name, title, company, rating, mentees, slotsAvai
             </div>
             
             <div className="relative z-10 w-full pt-4 border-t border-slate-800 mt-auto">
-                <button 
-                    disabled={slotsAvailable === 0}
-                    className={`w-full py-3 rounded-xl font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 ${
-                        slotsAvailable > 0 
-                        ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_30px_rgba(245,158,11,0.4)]' 
-                        : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
-                    }`}
-                >
-                    {slotsAvailable > 0 ? 'Request Mentorship' : 'Currently Unavailable'}
-                </button>
+                <Link to={`/mentorship/request/${id}`} className="block w-full">
+                    <button 
+                        disabled={slotsAvailable === 0}
+                        className={`w-full py-3 rounded-xl font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 ${
+                            slotsAvailable > 0 
+                            ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_30px_rgba(245,158,11,0.4)]' 
+                            : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
+                        }`}
+                    >
+                        {slotsAvailable > 0 ? 'Request Mentorship' : 'Currently Unavailable'}
+                    </button>
+                </Link>
             </div>
         </motion.div>
     );
