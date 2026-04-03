@@ -12,22 +12,10 @@ return new class extends Migration
     public function up(): void
 {
     Schema::create('users', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
+        $table->id('user_id');
         $table->string('email')->unique();
-        $table->timestamp('email_verified_at')->nullable();
         $table->string('password');
-        
-        $table->string('linkedin_url')->nullable();
-        $table->text('short_bio')->nullable();
-        $table->string('job_title')->nullable();
-        $table->string('company')->nullable();
-        $table->string('role')->default('user');
-        $table->string('student_id')->nullable();
-        $table->string('department')->nullable();
-        $table->decimal('cgpa', 3, 2)->nullable();
-        $table->string('recruiter_company')->nullable();
-
+        $table->string('role'); // student, alumni, recruiter
         $table->rememberToken();
         $table->timestamps();
     });
