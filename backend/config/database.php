@@ -99,20 +99,28 @@ return [
         ],
 
         'sqlsrv' => [
-    'driver' => 'sqlsrv',
-    'url' => env('DB_URL'),
-    'host' => env('DB_HOST', 'db'), // Using 'db' as per your docker-compose
-    'port' => env('DB_PORT', '1433'),
-    'database' => env('DB_DATABASE', 'alumni_dbms'),
-    'username' => env('DB_USERNAME', 'sa'),
-    'password' => env('DB_PASSWORD', 'root@123'),
-    'charset' => 'utf8',
-    'prefix' => '',
-    'prefix_indexes' => true,
-    // FORCE THESE SETTINGS REGARDLESS OF .ENV
-    'encrypt' => 'yes',
-    'trust_server_certificate' => true, 
-],
+            'driver' => 'sqlsrv',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', 'db'), // Using 'db' as per your docker-compose
+            'port' => env('DB_PORT', '1433'),
+            'database' => env('DB_DATABASE', 'alumni_dbms'),
+            'username' => env('DB_USERNAME', 'sa'),
+            'password' => env('DB_PASSWORD', 'root@123'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            // FORCE THESE SETTINGS REGARDLESS OF .ENV
+            'encrypt' => 'yes',
+            'odbc_datasource_name' => null,
+            'options' => extension_loaded('pdo_sqlsrv') ? [
+                PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+                PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE => true,
+                PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
+            ] : [
+                PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+            ],
+            'trust_server_certificate' => true, 
+        ],
 
     ],
 
