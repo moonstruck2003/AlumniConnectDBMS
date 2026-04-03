@@ -24,3 +24,17 @@ COPY . .
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+
+# Install system dependencies for SQL Server drivers
+RUN apt-get update && apt-get install -y unixodbc-dev gnupg2 
+
+# Install the PHP extensions
+RUN pecl install sqlsrv pdo_sqlsrv \
+    && docker-php-ext-enable sqlsrv pdo_sqlsrv
+
+# Install dependencies for intl
+RUN apt-get update && apt-get install -y libicu-dev
+
+# Install the extension
+RUN docker-php-ext-install intl    
