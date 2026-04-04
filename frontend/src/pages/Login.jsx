@@ -2,18 +2,32 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, BookOpen } from 'lucide-react';
+import authService from '../services/authService';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Login logic would be here
-    console.log('Login submitted:', { email, password });
-    navigate('/dashboard');
+    setError('');
+    setLoading(true);
+    try {
+      const response = await authService.login({ email, password });
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -90,6 +104,12 @@ export default function Login() {
               <p className="text-slate-400 text-sm">Please enter your credentials to access your account.</p>
             </div>
 
+            {error && (
+              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+                {error}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Input */}
               <div className="space-y-2">
@@ -134,21 +154,24 @@ export default function Login() {
 
               {/* Login Button */}
               <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={!loading ? { scale: 1.01 } : {}}
+                whileTap={!loading ? { scale: 0.98 } : {}}
                 onHoverStart={() => setIsHovered(true)}
                 onHoverEnd={() => setIsHovered(false)}
                 type="submit"
-                className="w-full flex items-center justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg shadow-black/20 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-all duration-200 group"
+                disabled={loading}
+                className={`w-full flex items-center justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg shadow-black/20 text-sm font-bold text-white transition-all duration-200 group ${loading ? 'bg-blue-600/50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600'}`}
               >
-                Sign In
-                <motion.div
-                  animate={{ x: isHovered ? 4 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="ml-2"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </motion.div>
+                {loading ? 'Signing In...' : 'Sign In'}
+                {!loading && (
+                  <motion.div
+                    animate={{ x: isHovered ? 4 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="ml-2"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </motion.div>
+                )}
               </motion.button>
             </form>
 
