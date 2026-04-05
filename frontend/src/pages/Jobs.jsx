@@ -1,96 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Search, Briefcase, MapPin, DollarSign, Clock, Filter, ChevronRight, Building2, Zap } from 'lucide-react';
+import { 
+  Search, 
+  Briefcase, 
+  MapPin, 
+  DollarSign, 
+  Clock, 
+  Filter, 
+  ChevronRight, 
+  Building2, 
+  Zap,
+  Plus,
+  Mail,
+  CheckCircle2,
+  XCircle,
+  Tag
+} from 'lucide-react';
 import Navbar from '../components/Navbar';
+import Modal from '../components/Modal';
+import jobService from '../services/jobService';
+import authService from '../services/authService';
 import './Jobs.css';
 
-const MOCK_JOBS = [
-  {
-    id: 1,
-    title: "Senior Full Stack Engineer",
-    company: "Google",
-    location: "Mountain View, CA",
-    salary: "$180k - $240k",
-    type: "Full-time",
-    category: "Engineering",
-    posted: "2 days ago",
-    logo: "G",
-    color: "blue"
-  },
-  {
-    id: 2,
-    title: "Product Designer",
-    company: "Airbnb",
-    location: "Remote",
-    salary: "$140k - $190k",
-    type: "Full-time",
-    category: "Design",
-    posted: "5 hours ago",
-    logo: "A",
-    color: "rose"
-  },
-  {
-    id: 3,
-    title: "Software Engineer Intern",
-    company: "Meta",
-    location: "Menlo Park, CA",
-    salary: "$8k - $12k / mo",
-    type: "Internship",
-    category: "Engineering",
-    posted: "1 week ago",
-    logo: "M",
-    color: "blue"
-  },
-  {
-    id: 4,
-    title: "Marketing Manager",
-    company: "Slack",
-    location: "San Francisco, CA",
-    salary: "$120k - $160k",
-    type: "Full-time",
-    category: "Marketing",
-    posted: "3 days ago",
-    logo: "S",
-    color: "purple"
-  },
-  {
-    id: 5,
-    title: "Backend Developer",
-    company: "Stripe",
-    location: "Remote / Dublin",
-    salary: "$160k - $210k",
-    type: "Permanent",
-    category: "Engineering",
-    posted: "1 day ago",
-    logo: "S",
-    color: "indigo"
-  },
-  {
-    id: 6,
-    title: "UX Researcher",
-    company: "Microsoft",
-    location: "Redmond, WA",
-    salary: "$130k - $175k",
-    type: "Full-time",
-    category: "Design",
-    posted: "4 days ago",
-    logo: "M",
-    color: "blue"
-  }
-];
-
 export default function Jobs() {
+  const [jobs, setJobs] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedType, setSelectedType] = useState('All');
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const categories = ['All', 'Engineering', 'Design', 'Marketing', 'Product', 'Data Science'];
+  const user = authService.getCurrentUser();
+  const isRecruiter = user?.role === 'recruiter';
 
-  const filteredJobs = MOCK_JOBS.filter(job => {
-    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          job.company.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || job.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [jobsData, categoriesData] = await Promise.all([
+          jobService.getJobs(),
+          jobService.getCategories()
+        ]);
+        setJobs(jobsData);
+        setCategories(['All', ...categoriesData.map(c => c.category_name)]);
+      } catch (err) {
+        console.error('Failed to fetch data', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleToggle = async (e, jobId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const response = await jobService.toggleJob(jobId);
+      setJobs(jobs.map(j => j.job_id === jobId ? { ...j, is_active: response.is_active } : j));
+    } catch (err) {
+      console.error('Failed to toggle job', err);
+    }
+  };
+
+  const filteredJobs = jobs.filter(job => {
+    const matchesSearch = job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          (job.company_name && job.company_name.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    // Category match
+    const matchesCategory = selectedCategory === 'All' || job.category?.category_name === selectedCategory;
+    
+    // Type match
+    const matchesType = selectedType === 'All' || job.job_type === selectedType;
+    
+    return matchesSearch && matchesCategory && matchesType;
   });
 
   const containerVariants = {
@@ -98,15 +83,6 @@ export default function Jobs() {
     visible: { 
       opacity: 1, 
       transition: { staggerChildren: 0.1 } 
-    }
-  };
-
-  const itemVariants = {
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      scale: 1,
-      transition: { type: "spring", stiffness: 260, damping: 20 } 
     }
   };
 
@@ -138,38 +114,53 @@ export default function Jobs() {
           </motion.div>
 
           {/* Search Bar */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="max-w-2xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 p-2 rounded-[2rem] bg-slate-900/40 backdrop-blur-3xl border border-white/10 shadow-2xl group/search focus-within:border-blue-500/50 transition-all"
-          >
-            <div className="flex items-center gap-3 px-5 py-3">
-              <Search className="w-5 h-5 text-slate-500 group-focus-within/search:text-blue-400 transition-colors" />
-              <input 
-                type="text" 
-                placeholder="Search legacy-defining roles..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-transparent border-none outline-none text-lg placeholder-slate-700 font-semibold"
-              />
-            </div>
-            <button className="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-[1.5rem] font-black transition-all shadow-lg flex items-center gap-2 uppercase tracking-wider text-[10px]">
-              <Zap className="w-4 h-4 fill-current" />
-              Discover
-            </button>
-          </motion.div>
+          <div className="max-w-4xl mx-auto mt-10 flex flex-col md:flex-row gap-4">
+             <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: 0.2, duration: 0.8 }}
+               className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 p-2 rounded-[2rem] bg-slate-900/40 backdrop-blur-3xl border border-white/10 shadow-2xl group/search focus-within:border-blue-500/50 transition-all"
+             >
+               <div className="flex items-center gap-3 px-5 py-3">
+                 <Search className="w-5 h-5 text-slate-500 group-focus-within/search:text-blue-400 transition-colors" />
+                 <input 
+                   type="text" 
+                   placeholder="Search legacy-defining roles..." 
+                   value={searchTerm}
+                   onChange={(e) => setSearchTerm(e.target.value)}
+                   className="w-full bg-transparent border-none outline-none text-lg placeholder-slate-700 font-semibold"
+                 />
+               </div>
+               <button className="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-[1.5rem] font-black transition-all shadow-lg flex items-center gap-2 uppercase tracking-wider text-[10px]">
+                 <Zap className="w-4 h-4 fill-current" />
+                 Discover
+               </button>
+             </motion.div>
+
+             {isRecruiter && (
+                <Link to="/post-job" className="md:w-auto w-full">
+                   <motion.button 
+                     whileHover={{ scale: 1.05 }}
+                     whileTap={{ scale: 0.95 }}
+                     className="w-full h-full px-8 py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-[2rem] font-black flex items-center justify-center gap-3 shadow-xl shadow-emerald-600/20 uppercase tracking-widest text-[10px]"
+                   >
+                     <Plus className="w-5 h-5" />
+                     Post Opportunity
+                   </motion.button>
+                </Link>
+             )}
+          </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16">
+      <main className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16 mt-16">
         {/* Filters Sidebar */}
         <aside className="hidden lg:block">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.4 }}
             className="sticky top-32 space-y-12 p-8 rounded-[2.5rem] bg-slate-900/30 border border-white/5 backdrop-blur-xl"
           >
             <div className="space-y-8">
@@ -201,12 +192,34 @@ export default function Jobs() {
               </div>
             </div>
 
+            <div className="space-y-8 pt-8 border-t border-slate-800/50">
+               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] flex items-center gap-3">
+                 <Tag className="w-4 h-4" />
+                 Classification
+               </h4>
+               <div className="grid grid-cols-2 gap-2">
+                  {['All', 'Job', 'Internship'].map(type => (
+                     <button
+                       key={type}
+                       onClick={() => setSelectedType(type)}
+                       className={`px-4 py-3 rounded-xl border font-black text-[9px] uppercase tracking-widest transition-all ${
+                         selectedType === type
+                         ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
+                         : 'bg-slate-950/50 border-slate-800 text-slate-600 hover:text-slate-400'
+                       }`}
+                     >
+                       {type}
+                     </button>
+                  ))}
+               </div>
+            </div>
+
             <div className="p-8 rounded-[2rem] bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/20 space-y-6 relative overflow-hidden group/cta">
               <div className="absolute -right-4 -bottom-4 opacity-10 group-hover/cta:scale-110 transition-transform">
                 <Briefcase className="w-32 h-32" />
               </div>
-              <h5 className="font-black text-white text-lg tracking-tight relative z-10">Expand the legacy?</h5>
-              <p className="text-sm text-blue-200/60 leading-relaxed font-semibold relative z-10">Recruit top-tier talent from our elite alumni network.</p>
+              <h5 className="font-black text-white text-lg tracking-tight relative z-10 italic">Expand the legacy?</h5>
+              <p className="text-sm text-blue-200/60 leading-relaxed font-semibold relative z-10 italic">Recruit top-tier talent from our elite alumni network.</p>
               <button className="w-full py-4 bg-white/10 hover:bg-white text-slate-400 hover:text-slate-950 rounded-2xl font-black transition-all border border-white/10 text-[10px] uppercase tracking-widest relative z-10">
                 Launch Posting
               </button>
@@ -220,97 +233,157 @@ export default function Jobs() {
             <p className="text-slate-500 text-sm font-black uppercase tracking-[0.2em]">
               Curated List / <span className="text-slate-100">{filteredJobs.length}</span> Opportunities
             </p>
-            <div className="flex items-center gap-4 bg-slate-900/50 px-6 py-3 rounded-2xl border border-white/5">
-              <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Chronology:</span>
-              <select className="bg-transparent border-none text-blue-400 text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer">
-                <option>Newest Premier</option>
-                <option>Compensation</option>
-              </select>
-            </div>
           </div>
 
-          <motion.div 
-            variants={containerVariants}
-            initial="visible"
-            animate="visible"
-            className="grid gap-8"
-          >
-            <AnimatePresence mode='popLayout'>
-              {filteredJobs.map((job) => (
-                <motion.div
-                  key={job.id}
-                  initial={{ opacity: 1, y: 0 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  layout
-                  whileHover={{ 
-                    y: -10, 
-                    borderColor: 'rgba(59, 130, 246, 0.4)',
-                    boxShadow: '0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(59, 130, 246, 0.1)' 
-                  }}
-                  className="p-10 rounded-[3rem] bg-slate-900 border border-slate-800 shadow-2xl flex flex-col md:flex-row items-center gap-10 transition-all relative overflow-hidden group/card"
-                >
-                  <div className="absolute top-0 right-0 p-8 opacity-100 translate-y-0">
-                     <div className="px-4 py-1.5 bg-blue-500/20 rounded-full text-[9px] font-black text-blue-400 uppercase tracking-[0.2em] border border-blue-500/30">
-                       Premier Active
-                     </div>
-                  </div>
-
-                  {/* Company Logo with Pulse */}
-                  <div className="relative shrink-0">
-                    <div className={`absolute inset-0 bg-${job.color}-500/10 rounded-[2rem] blur-2xl opacity-100 shadow-lg shadow-${job.color}-500/5`} />
-                    <div className={`w-24 h-24 rounded-[2rem] bg-slate-950 border border-slate-800 flex items-center justify-center text-4xl font-black text-${job.color}-500 shadow-2xl relative z-10 transition-all duration-500 group-hover/card:rotate-[10deg] group-hover/card:scale-110`}>
-                      {job.logo}
+          {loading ? (
+            <div className="flex justify-center py-40">
+               <div className="w-12 h-12 border-4 border-blue-500/10 border-t-blue-500 rounded-full animate-spin" />
+            </div>
+          ) : (
+            <motion.div 
+              variants={containerVariants}
+              initial="visible"
+              animate="visible"
+              className="grid gap-10"
+            >
+              <AnimatePresence mode='popLayout'>
+                {filteredJobs.map((job) => (
+                  <motion.div
+                    key={job.job_id}
+                    layout
+                    whileHover={{ 
+                      y: -10, 
+                      borderColor: 'rgba(59, 130, 246, 0.4)',
+                      boxShadow: '0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(59, 130, 246, 0.1)' 
+                    }}
+                    className={`p-10 rounded-[3rem] bg-slate-900 border border-slate-800 shadow-2xl flex flex-col md:flex-row items-center gap-10 transition-all relative overflow-hidden group/card ${!job.is_active ? 'opacity-60 grayscale' : ''}`}
+                  >
+                    <div className="absolute top-0 right-0 p-8">
+                       <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border ${job.is_active ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-slate-800/20 text-slate-500 border-slate-800'}`}>
+                         {job.is_active ? 'Status: Active' : 'Status: Closed'}
+                       </div>
                     </div>
-                  </div>
 
-                  {/* Info */}
-                  <div className="flex-1 space-y-6 text-center md:text-left">
-                    <div className="space-y-2">
-                      <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <h3 className="text-3xl font-black text-white group-hover/card:text-blue-400 transition-colors tracking-tight">{job.title}</h3>
-                        <div className="flex justify-center md:justify-start">
-                          <span className="px-3 py-1 bg-slate-800/50 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-widest border border-slate-700/50 group-hover/card:border-blue-500/30 transition-colors">
-                            {job.type}
-                          </span>
+                    {/* Company Logo */}
+                    <div className="relative shrink-0">
+                      <div className="w-24 h-24 rounded-[2rem] bg-slate-950 border border-slate-800 flex items-center justify-center text-4xl font-black text-blue-500 shadow-2xl relative z-10 transition-all duration-500 group-hover/card:rotate-[10deg] group-hover/card:scale-110">
+                        {job.company_name?.[0] || job.job_title[0]}
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 space-y-6 text-center md:text-left">
+                      <div className="space-y-2">
+                        <div className="flex flex-col md:flex-row md:items-center gap-4">
+                          <h3 className="text-3xl font-black text-white group-hover/card:text-blue-400 transition-colors tracking-tight uppercase leading-none">{job.job_title}</h3>
+                          <div className="flex justify-center md:justify-start">
+                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${job.job_type === 'Internship' ? 'bg-amber-500/5 text-amber-500 border-amber-500/20' : 'bg-blue-500/5 text-blue-400 border-blue-500/20'}`}>
+                              {job.job_type}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-blue-400/80 font-black text-sm uppercase tracking-widest flex items-center justify-center md:justify-start gap-3">
+                          <Building2 className="w-4 h-4 text-blue-500/50" />
+                          {job.company_name || "Enterprise"}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap justify-center md:justify-start gap-8">
+                        <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-widest">
+                          <MapPin className="w-4 h-4 text-slate-700" />
+                          {job.location || 'Remote'}
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-widest">
+                          <DollarSign className="w-4 h-4 text-slate-700" />
+                          {job.salary || 'Competitive'}
+                        </div>
+                        <div className="flex items-center gap-2 text-teal-400/60 text-xs font-black uppercase tracking-widest">
+                          <Clock className="w-4 h-4 text-teal-500/30" />
+                          {new Date(job.created_at).toLocaleDateString()}
                         </div>
                       </div>
-                      <p className="text-blue-400/80 font-black text-sm uppercase tracking-widest flex items-center justify-center md:justify-start gap-3">
-                        <Building2 className="w-4 h-4 text-blue-500/50" />
-                        {job.company}
-                      </p>
                     </div>
 
-                    <div className="flex flex-wrap justify-center md:justify-start gap-8">
-                      <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-widest">
-                        <MapPin className="w-4 h-4 text-slate-700" />
-                        {job.location}
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-widest">
-                        <DollarSign className="w-4 h-4 text-slate-700" />
-                        {job.salary}
-                      </div>
-                      <div className="flex items-center gap-2 text-teal-400/60 text-xs font-black uppercase tracking-widest">
-                        <Clock className="w-4 h-4 text-teal-500/30" />
-                        {job.posted}
-                      </div>
-                    </div>
-                  </div>
+                    {/* Actions */}
+                    <div className="flex flex-col items-center gap-4 w-full md:w-auto pt-8 md:pt-0 border-t md:border-t-0 border-slate-800/50 md:pl-10">
+                       <button 
+                         onClick={() => {
+                           setSelectedJob(job);
+                           setIsModalOpen(true);
+                         }}
+                         className="w-full md:w-48 px-12 py-5 bg-white text-slate-950 hover:bg-blue-600 hover:text-white rounded-[1.8rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl hover:shadow-blue-500/30 flex items-center justify-center gap-3"
+                       >
+                          Apply
+                          <ChevronRight className="w-4 h-4" />
+                       </button>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-4 w-full md:w-auto pt-8 md:pt-0 border-t md:border-t-0 border-slate-800/50 md:pl-10">
-                     <Link to={`/jobs/details/${job.id}`} className="flex-1 md:flex-none">
-                        <button className="w-full px-12 py-5 bg-white text-slate-950 hover:bg-blue-600 hover:text-white rounded-[1.8rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl hover:shadow-blue-500/30 flex items-center justify-center gap-3">
-                           Initialize
-                           <ChevronRight className="w-4 h-4" />
-                        </button>
-                     </Link>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
+
+          {/* Application Modal */}
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            title="Transmission Protocol"
+            type="info"
+          >
+            {selectedJob && (
+              <div className="space-y-8">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-blue-600/10 border border-blue-600/20 flex items-center justify-center">
+                    <Mail className="text-blue-400 w-8 h-8" />
                   </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+                  <div>
+                    <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">Direct Contact Node</h4>
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Established secure connection</p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950/50 border border-slate-800 p-8 rounded-3xl relative overflow-hidden group/modal-card">
+                  <div className="relative z-10 text-center">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Target Endpoint</p>
+                    <a 
+                      href={`mailto:${selectedJob.contact_email}`}
+                      className="text-2xl font-black text-white hover:text-blue-400 transition-colors tracking-tighter block break-all"
+                    >
+                      {selectedJob.contact_email}
+                    </a>
+                  </div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl -mr-16 -mt-16" />
+                </div>
+
+                <p className="text-slate-400 font-medium text-center text-sm leading-relaxed italic px-4">
+                  "Please initiate contact via the provided email. Your professional record will be buffered and stored upon transmission."
+                </p>
+
+                <div className="pt-4">
+                  <button 
+                    onClick={() => setIsModalOpen(false)}
+                    className="w-full py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/5"
+                  >
+                    Close Protocol
+                  </button>
+                </div>
+              </div>
+            )}
+          </Modal>
+
+          {!loading && filteredJobs.length === 0 && (
+             <div className="py-40 text-center grayscale opacity-30">
+                <div className="inline-flex w-32 h-32 bg-slate-900 rounded-[2.5rem] items-center justify-center border-2 border-slate-800 mb-8 shadow-inner">
+                  <Search className="text-slate-700" size={56} strokeWidth={1} />
+                </div>
+                <h3 className="text-3xl font-black text-white mb-2 tracking-tighter uppercase italic">No Signals Found</h3>
+                <p className="text-slate-600 font-bold uppercase tracking-widest text-xs">Adjust your frequency to discover new opportunities.</p>
+             </div>
+          )}
         </div>
       </main>
     </div>
   );
 }
+

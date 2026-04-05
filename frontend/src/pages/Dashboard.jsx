@@ -13,7 +13,6 @@ import {
   Layout
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
 import userService from '../services/userService';
 
@@ -36,12 +35,10 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-row">
-      <Sidebar />
-      <div className="flex-1 lg:ml-[280px]">
-        <Navbar />
-        
-        <main className="max-w-7xl mx-auto px-6 lg:px-10 pt-32 pb-20">
+    <div className="min-h-screen bg-slate-950 flex flex-col">
+      <Navbar />
+      
+      <main className="max-w-7xl mx-auto px-6 lg:px-10 pt-32 pb-20">
           
           <motion.div 
              initial={{ opacity: 0, x: -20 }}
@@ -154,7 +151,6 @@ const Dashboard = () => {
             </div>
           </motion.div>
         </main>
-      </div>
     </div>
   );
 };
