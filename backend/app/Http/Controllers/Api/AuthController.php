@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -20,20 +17,19 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $credentials = $request->only('email', 'password');
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (! $token = auth('api')->attempt($credentials)) {
             return response()->json([
                 'message' => 'Invalid email or password.'
             ], 401);
         }
 
-        // Create a Sanctum token for the user
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user = auth('api')->user()->load(['profile', 'recruiter', 'student', 'alumni']);
 
         return response()->json([
             'message' => 'Login successful',
-            'user' => $user->load(['recruiter', 'student']),
+            'user' => $user,
             'token' => $token,
         ], 200);
     }
@@ -43,10 +39,32 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        auth('api')->logout();
 
         return response()->json([
             'message' => 'Logged out successfully'
+        ], 200);
+    }
+
+    /**
+     * Return the authenticated user (JWT subject).
+     */
+    public function me(Request $request)
+    {
+        $user = $request->user()->load(['profile', 'recruiter', 'student', 'alumni']);
+
+        return response()->json([
+            'user' => $user,
+        ], 200);
+    }
+
+    /**
+     * Issue a new JWT (requires valid token within refresh TTL).
+     */
+    public function refresh()
+    {
+        return response()->json([
+            'token' => auth('api')->refresh(),
         ], 200);
     }
 }

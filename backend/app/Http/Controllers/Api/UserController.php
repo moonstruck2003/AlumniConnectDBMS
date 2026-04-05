@@ -9,7 +9,6 @@ use App\Models\Student;
 use App\Models\Alumni;
 use App\Models\Recruiter;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
@@ -36,7 +35,7 @@ class UserController extends Controller
 
             $user = User::create([
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => $request->password,
                 'role' => $request->role,
             ]);
 
@@ -71,16 +70,15 @@ class UserController extends Controller
 
             DB::commit();
 
-            // Load the full profile and name for the response
-            $user->load('profile');
-            
-            // Create a Sanctum token to auto-login the user
-            $token = $user->createToken('auth_token')->plainTextToken;
+            $user->refresh();
+            $user->load(['profile', 'recruiter', 'student', 'alumni']);
+
+            $token = auth('api')->login($user);
 
             return response()->json([
                 'message' => 'Account created successfully!',
                 'user' => $user,
-                'token' => $token
+                'token' => $token,
             ], 201);
 
         } catch (\Exception $e) {
