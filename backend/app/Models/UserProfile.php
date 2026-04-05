@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class UserProfile extends Model
+{
+    use HasFactory;
+
+    protected $primaryKey = 'profile_id';
+
+    protected $fillable = [
+        'user_id',
+        'first_name',
+        'last_name',
+        'bio',
+        'linkedin_url',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+}
