@@ -60,6 +60,7 @@ class UserController extends Controller
                     'user_id' => $user->user_id,
                     'company' => $request->company,
                     'job_title' => $request->job_title,
+                    'is_accepting_mentee' => true,
                 ]);
             } elseif ($request->role === 'recruiter') {
                 Recruiter::create([

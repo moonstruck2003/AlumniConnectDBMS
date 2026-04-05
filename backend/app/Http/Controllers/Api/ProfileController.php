@@ -50,6 +50,7 @@ class ProfileController extends Controller
             // Alumni specific
             'company' => 'nullable|string|max:150',
             'job_title' => 'nullable|string|max:150',
+            'is_accepting_mentee' => 'nullable|boolean',
             // Recruiter specific
             'company_name' => 'nullable|string|max:150',
         ]);
@@ -69,7 +70,7 @@ class ProfileController extends Controller
             if ($user->role === 'student' && $user->student) {
                 $user->student->update($request->only(['cgpa', 'department']));
             } elseif ($user->role === 'alumni' && $user->alumni) {
-                $user->alumni->update($request->only(['company', 'job_title']));
+                $user->alumni->update($request->only(['company', 'job_title', 'is_accepting_mentee']));
             } elseif ($user->role === 'recruiter' && $user->recruiter) {
                 $user->recruiter->update($request->only(['company_name']));
             }
