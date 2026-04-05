@@ -6,19 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UserProfile;
+use App\Models\MentorshipListing;
 use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
-    /**
-     * Fetch the authenticated user along with their profile and role-specific data.
-     */
     public function show(Request $request)
     {
-        // Load the main profile
         $user = $request->user()->load(['profile']);
 
-        // Load specific role relationship based on user's role
         if ($user->role === 'student') {
             $user->load('student');
         } elseif ($user->role === 'alumni') {
@@ -32,9 +28,6 @@ class ProfileController extends Controller
         ], 200);
     }
 
-    /**
-     * Update the authenticated user's profile details across multiple tables.
-     */
     public function update(Request $request)
     {
         $user = $request->user();
@@ -71,6 +64,17 @@ class ProfileController extends Controller
                 $user->student->update($request->only(['cgpa', 'department']));
             } elseif ($user->role === 'alumni' && $user->alumni) {
                 $user->alumni->update($request->only(['company', 'job_title', 'is_accepting_mentee']));
+                
+                // Ensure Mentorship Listing exists for directory if accepting mentees
+                if ($user->alumni->is_accepting_mentee) {
+                    MentorshipListing::firstOrCreate(
+                        ['alumni_id' => $user->alumni->alumni_id],
+                        [
+                            'description' => "Experienced {$user->alumni->job_title} at {$user->alumni->company} looking to guide members.",
+                            'min_coin_bid' => 0
+                        ]
+                    );
+                }
             } elseif ($user->role === 'recruiter' && $user->recruiter) {
                 $user->recruiter->update($request->only(['company_name']));
             }
@@ -88,9 +92,6 @@ class ProfileController extends Controller
         }
     }
 
-    /**
-     * Delete the authenticated user account and all relating data.
-     */
     public function destroy(Request $request)
     {
         $user = $request->user();
@@ -98,14 +99,11 @@ class ProfileController extends Controller
         try {
             DB::beginTransaction();
 
-            // Roles are usually tied to user_id, so they'll be cleaned up if foreign keys cascade
-            // But we can do it manually to be safe if cascades aren't defined
             if ($user->student) $user->student->delete();
             if ($user->alumni) $user->alumni->delete();
             if ($user->recruiter) $user->recruiter->delete();
             if ($user->profile) $user->profile->delete();
 
-            // Final User teardown
             $user->delete();
 
             DB::commit();
