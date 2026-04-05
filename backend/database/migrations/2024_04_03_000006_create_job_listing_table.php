@@ -10,10 +10,17 @@ return new class extends Migration
     {
         Schema::create('job_listing', function (Blueprint $table) {
             $table->id('job_id');
-            $table->foreignId('recruiter_id')->constrained('recruiters', 'recruiter_id');
-            $table->foreignId('category_id')->constrained('job_categories', 'category_id');
+            $table->foreignId('recruiter_id')->constrained('recruiters', 'recruiter_id')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('job_categories', 'category_id')->onDelete('cascade');
             $table->string('job_title');
+            $table->string('company_name')->nullable();
+            $table->enum('job_type', ['Job', 'Internship'])->default('Job');
+            $table->string('location')->nullable();
+            $table->text('salary')->nullable();
+            $table->date('deadline')->nullable();
+            $table->string('contact_email');
             $table->text('job_description')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

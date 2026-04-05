@@ -33,7 +33,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Login successful',
-            'user' => $user,
+            'user' => $user->load(['recruiter', 'student']),
             'token' => $token,
         ], 200);
     }
