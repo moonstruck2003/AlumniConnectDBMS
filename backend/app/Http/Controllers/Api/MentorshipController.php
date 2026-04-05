@@ -71,10 +71,10 @@ class MentorshipController extends Controller
      */
     public function myIncomingRequests(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user()->load('alumni');
 
-        if ($user->role !== 'alumni') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if (!$user->alumni) {
+            return response()->json(['message' => 'Alumni profile not found.'], 404);
         }
 
         $requests = MentorshipRequest::with(['student.user.profile', 'listing'])
@@ -92,10 +92,10 @@ class MentorshipController extends Controller
      */
     public function mySentRequests(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user()->load('student');
 
-        if ($user->role !== 'student') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if (!$user->student) {
+            return response()->json(['message' => 'Student profile not found.'], 404);
         }
 
         $requests = MentorshipRequest::with(['listing.alumni.user.profile'])
@@ -111,10 +111,10 @@ class MentorshipController extends Controller
      */
     public function updateRequestStatus(Request $request, $requestId)
     {
-        $user = $request->user();
+        $user = $request->user()->load('alumni');
 
-        if ($user->role !== 'alumni') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if (!$user->alumni) {
+            return response()->json(['message' => 'Unauthorized: Only alumni can update status.'], 403);
         }
 
         $request->validate([
@@ -124,8 +124,12 @@ class MentorshipController extends Controller
         $mentorshipRequest = MentorshipRequest::with('listing')->findOrFail($requestId);
 
         // Ensure this listing belongs to the authenticated alumni
-        if ($mentorshipRequest->listing->alumni_id !== $user->alumni->alumni_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if ((int)$mentorshipRequest->listing->alumni_id !== (int)$user->alumni->alumni_id) {
+            return response()->json([
+                'message' => 'Unauthorized: This request does not belong to you.',
+                'listing_alumni' => $mentorshipRequest->listing->alumni_id,
+                'logged_alumni' => $user->alumni->alumni_id
+            ], 403);
         }
 
         $mentorshipRequest->update([
