@@ -1,52 +1,70 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Mail, Lock, User, ArrowRight, BookOpen, GraduationCap, Briefcase, ShieldCheck } from 'lucide-react';
-import axios from 'axios'; // Import Axios
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, BookOpen, GraduationCap, Briefcase, ArrowRight, FileText, Building2, Link as LinkIcon, Mail, Lock, Hash } from 'lucide-react';
+import axios from 'axios';
 
 export default function Signup() {
-  const [name, setName] = useState('');
+  const [role, setRole] = useState('Student');
+  
+  // Base details
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('Student');
-  const [isHovered, setIsHovered] = useState(false);
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [bio, setBio] = useState('');
+
+  // Role specific details
+  const [studentId, setStudentId] = useState('');
+  const [cgpa, setCgpa] = useState('');
+  const [department, setDepartment] = useState('');
+  
+  const [companyName, setCompanyName] = useState('');
+  
+  const [alumniCompany, setAlumniCompany] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const roles = [
-    { id: 'Student', icon: <GraduationCap className="w-5 h-5" />, color: 'blue' },
-    { id: 'Alumni', icon: <User className="w-5 h-5" />, color: 'amber' },
-    { id: 'Recruiter', icon: <Briefcase className="w-5 h-5" />, color: 'emerald' },
-    { id: 'Admin', icon: <ShieldCheck className="w-5 h-5" />, color: 'rose' }
+    { id: 'Alumni', icon: <User className="w-5 h-5 mb-2" /> },
+    { id: 'Student', icon: <GraduationCap className="w-5 h-5 mb-2" /> },
+    { id: 'Recruiter', icon: <Briefcase className="w-5 h-5 mb-2" /> }
   ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-
     setLoading(true);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/signup', {
-        name: name,
+      const payload = {
+        first_name: firstName,
+        last_name: lastName,
+        name: `${firstName} ${lastName}`.trim(), // keeping for compatibility
         email: email,
         password: password,
-        role: role.toLowerCase(), // Detection: Normalizes 'Alumni' to 'alumni' for DB
-      });
+        linkedin_url: linkedinUrl,
+        bio: bio,
+        role: role.toLowerCase(),
+      };
+
+      if (role === 'Student') {
+        payload.student_id = studentId;
+        payload.cgpa = cgpa;
+        payload.department = department;
+      } else if (role === 'Recruiter') {
+        payload.company_name = companyName;
+      } else if (role === 'Alumni') {
+        payload.company = alumniCompany;
+        payload.job_title = jobTitle;
+      }
+
+      const response = await axios.post('http://127.0.0.1:8000/api/signup', payload);
 
       if (response.status === 201) {
-        console.log('Signup Successful:', response.data);
-        // Detection Logic: Redirect based on role
-        if (role.toLowerCase() === 'admin') {
-          navigate('/admin-dashboard');
-        } else {
-          navigate('/dashboard');
-        }
+        navigate('/dashboard');
       }
     } catch (error) {
       const errorMsg = error.response?.data?.errors 
@@ -59,150 +77,278 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 selection:bg-blue-500/30 overflow-hidden relative">
-      {/* Background Blurs */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-teal-600/5 rounded-full blur-[150px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-5xl bg-slate-900 border border-slate-800/80 rounded-[2.5rem] shadow-2xl flex overflow-hidden min-h-[650px] relative z-10"
-      >
-        {/* Left Side - Visual/Branding */}
-        <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-blue-900 via-indigo-900 to-teal-900 p-12 flex-col justify-between overflow-hidden">
+    <div className="min-h-screen bg-[#0b1120] flex items-center justify-center p-4 overflow-hidden relative">
+      <div className="w-full max-w-5xl bg-[#111827] border border-slate-800 rounded-2xl shadow-xl flex overflow-hidden min-h-[750px] relative z-10">
+        
+        {/* Left Side */}
+        <div className="hidden lg:flex lg:w-[45%] relative bg-gradient-to-br from-[#1d3557] via-[#152a45] to-[#0f1f33] p-12 flex-col justify-between overflow-hidden">
+          <div className="absolute top-[-50px] left-[-50px] w-64 h-64 bg-teal-500/20 rounded-full blur-[80px]"></div>
+          <div className="absolute bottom-[-50px] right-[-50px] w-64 h-64 bg-blue-500/20 rounded-full blur-[80px]"></div>
+          
           <div className="relative z-10">
             <div className="flex items-center gap-3 text-white">
-              <div className="w-12 h-12 bg-slate-900/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
-                <BookOpen className="w-6 h-6 text-teal-300" />
+              <div className="w-10 h-10 bg-teal-500/20 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-teal-400" />
               </div>
-              <span className="text-2xl font-bold tracking-tight text-white/90">AlumniConnect</span>
+              <span className="text-xl font-bold tracking-tight text-white">AlumniConnect</span>
             </div>
           </div>
-          <div className="relative z-10 mt-auto">
+          
+          <div className="relative z-10 mb-20">
             <h2 className="text-4xl font-extrabold text-white leading-tight mb-4">
-              Join the Alumni <br /> Community
+              Join Our Global<br />Network
             </h2>
-            <p className="text-blue-100/80 text-lg max-w-sm leading-relaxed">
-              Sign up to connect, mentor, and grow with your alma mater's network.
+            <p className="text-slate-300 text-sm leading-relaxed max-w-sm">
+              Create an account to connect with peers, discover exclusive opportunities, and engage with your alma mater.
             </p>
           </div>
         </div>
 
-        {/* Right Side - Form */}
-        <div className="w-full lg:w-1/2 p-8 sm:p-16 flex flex-col justify-center bg-slate-900">
-          <div className="max-w-md w-full mx-auto">
-            <div className="text-center lg:text-left mb-10">
-              <h3 className="text-3xl font-bold text-white tracking-tight mb-2">Create Your Account</h3>
-              <p className="text-slate-400 text-sm">Fill in your details to join the platform.</p>
+        {/* Right Side */}
+        <div className="w-full lg:w-[55%] bg-[#111827] flex flex-col p-8 lg:p-12 h-[750px] overflow-y-auto custom-scrollbar">
+          <div className="w-full">
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold text-white mb-2">Create an Account</h3>
+              <p className="text-slate-400 text-sm">Fill in your details to get started with AlumniConnect.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              
               {/* Role Selection */}
-              <div className="space-y-3">
-                <label className="text-sm font-semibold text-slate-300 block">Select Your Role</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div>
+                <label className="text-sm text-slate-300 block mb-3">I am a...</label>
+                <div className="grid grid-cols-3 gap-3">
                   {roles.map((r) => (
                     <div
                       key={r.id}
                       onClick={() => setRole(r.id)}
-                      className={`cursor-pointer p-4 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 relative overflow-hidden group/role ${
+                      className={`cursor-pointer p-4 rounded-xl border flex flex-col items-center justify-center transition-all ${
                         role === r.id 
-                          ? `border-blue-500/50 bg-blue-500/5` 
-                          : 'border-slate-800 bg-transparent hover:border-slate-700'
+                          ? 'border-teal-500 bg-[#111827] shadow-[inset_0_0_15px_rgba(20,184,166,0.15)] text-teal-400' 
+                          : 'border-slate-800 hover:border-slate-700 text-slate-400 bg-[#172136]'
                       }`}
                     >
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
-                        role === r.id 
-                          ? `bg-blue-600 text-white shadow-lg` 
-                          : 'bg-slate-800 text-slate-500'
-                      }`}>
-                        {r.icon}
-                      </div>
-                      <span className={`text-[10px] font-black uppercase tracking-[0.15em] ${
-                        role === r.id ? `text-blue-400` : 'text-slate-600'
-                      }`}>
-                        {r.id}
-                      </span>
+                      {r.icon}
+                      <span className="text-xs font-semibold">{r.id}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Input Fields */}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest block ml-1">Full Name</label>
-                  <input 
-                    type="text" 
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="block w-full px-4 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white outline-none focus:border-blue-500/50 transition-all text-sm"
-                    placeholder="Your Name"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest block ml-1">Email Address</label>
-                  <input 
-                    type="email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full px-4 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white outline-none focus:border-blue-500/50 transition-all text-sm"
-                    placeholder="you@university.edu"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest block ml-1">Password</label>
-                    <input 
-                      type="password" 
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="block w-full px-4 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white outline-none focus:border-blue-500/50 transition-all text-sm"
-                      placeholder="••••••••"
-                      required
-                    />
+              {/* Account Details Category */}
+              <div>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4 mt-6">Account Details</h4>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="relative">
+                      <label className="text-xs text-slate-400 block mb-1">First Name</label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <User className="h-4 w-4 text-slate-500" />
+                        </div>
+                        <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required
+                          className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                          placeholder="John" />
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <label className="text-xs text-slate-400 block mb-1">Last Name</label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <User className="h-4 w-4 text-slate-500" />
+                        </div>
+                        <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} required
+                          className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                          placeholder="Doe" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest block ml-1">Confirm</label>
-                    <input 
-                      type="password" 
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="block w-full px-4 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white outline-none focus:border-blue-500/50 transition-all text-sm"
-                      placeholder="••••••••"
-                      required
-                    />
+
+                  <div className="relative">
+                    <label className="text-xs text-slate-400 block mb-1">Email Address</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Mail className="h-4 w-4 text-slate-500" />
+                      </div>
+                      <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                        className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                        placeholder="you@university.edu" />
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <label className="text-xs text-slate-400 block mb-1">Password</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-4 w-4 text-slate-500" />
+                      </div>
+                      <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
+                        className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                        placeholder="••••••••" />
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <label className="text-xs text-slate-400 block mb-1">LinkedIn URL (Optional)</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <LinkIcon className="h-4 w-4 text-slate-500" />
+                      </div>
+                      <input type="url" value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)}
+                        className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                        placeholder="https://linkedin.com/in/username" />
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <label className="text-xs text-slate-400 block mb-1">Short Bio (Optional)</label>
+                    <div className="relative">
+                      <div className="absolute top-3 left-3 pointer-events-none">
+                        <FileText className="h-4 w-4 text-slate-500" />
+                      </div>
+                      <textarea value={bio} onChange={e => setBio(e.target.value)} rows="3"
+                        className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors resize-none"
+                        placeholder="Tell us a bit about yourself..." />
+                    </div>
                   </div>
                 </div>
               </div>
 
+              {/* Dynamic Section */}
+              <AnimatePresence mode='wait'>
+                {role === 'Student' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4 mt-6">Student Information</h4>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="relative">
+                          <label className="text-xs text-slate-400 block mb-1">Student ID</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Hash className="h-4 w-4 text-slate-500" />
+                            </div>
+                            <input type="text" value={studentId} onChange={e => setStudentId(e.target.value)} required
+                              className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                              placeholder="e.g. 2024-1-60-XXX" />
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <label className="text-xs text-slate-400 block mb-1">CGPA</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <FileText className="h-4 w-4 text-slate-500" />
+                            </div>
+                            <input type="number" step="0.01" max="4.0" min="0" value={cgpa} onChange={e => setCgpa(e.target.value)} required
+                              className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                              placeholder="e.g. 3.85" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <label className="text-xs text-slate-400 block mb-1">Department</label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Building2 className="h-4 w-4 text-slate-500" />
+                          </div>
+                          <input type="text" value={department} onChange={e => setDepartment(e.target.value)} required
+                            className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                            placeholder="Computer Science" />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {role === 'Recruiter' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4 mt-6">Company Detail</h4>
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <label className="text-xs text-slate-400 block mb-1">Company Name</label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Building2 className="h-4 w-4 text-slate-500" />
+                          </div>
+                          <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} required
+                            className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                            placeholder="Acme Corp" />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {role === 'Alumni' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4 mt-6">Alumni Details</h4>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="relative">
+                          <label className="text-xs text-slate-400 block mb-1">Current Company (Optional)</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Building2 className="h-4 w-4 text-slate-500" />
+                            </div>
+                            <input type="text" value={alumniCompany} onChange={e => setAlumniCompany(e.target.value)}
+                              className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                              placeholder="Google" />
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <label className="text-xs text-slate-400 block mb-1">Job Title (Optional)</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Briefcase className="h-4 w-4 text-slate-500" />
+                            </div>
+                            <input type="text" value={jobTitle} onChange={e => setJobTitle(e.target.value)}
+                              className="w-full bg-[#172136] border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 transition-colors"
+                              placeholder="Software Engineer" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <button
                 disabled={loading}
                 type="submit"
-                className="w-full flex items-center justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all disabled:opacity-50"
+                className="w-full flex items-center justify-center py-3.5 px-4 bg-teal-500 hover:bg-teal-600 text-slate-900 rounded-lg text-sm font-bold transition-all disabled:opacity-50 mt-4"
               >
-                {loading ? 'Processing...' : 'Sign Up'}
+                {loading ? 'Processing...' : 'Create Account'}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </button>
             </form>
 
-            <div className="mt-8 text-center">
-              <p className="text-sm text-slate-400">
+            <div className="mt-8 text-center text-sm pb-10">
+              <p className="text-slate-400">
                 Already have an account?{' '}
-                <Link to="/login" className="font-bold text-blue-600 hover:underline">
-                  Sign in here
+                <Link to="/login" className="font-bold text-teal-400 hover:text-teal-300">
+                  Sign in
                 </Link>
               </p>
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
+      
+      {/* Hide scrollbar styles locally */}
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #111827; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #334155; 
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #475569; 
+        }
+      `}</style>
     </div>
   );
 }
