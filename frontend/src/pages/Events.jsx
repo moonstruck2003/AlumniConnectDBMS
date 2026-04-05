@@ -1,74 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, Clock, Users, ArrowRight, Filter, Search, PlusCircle, Star } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, ArrowRight, Filter, Search, PlusCircle, Star, X } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import api from '../services/api';
 import './Events.css';
-
-const MOCK_EVENTS = [
-  {
-    id: 1,
-    title: "Global Alumni Networking 2024",
-    date: "OCT 24",
-    time: "6:00 PM - 9:00 PM",
-    location: "Grand Hall & Virtual",
-    category: "Networking",
-    attendees: 450,
-    image: "https://images.unsplash.com/photo-1511578334221-6f6f3d24d94b?auto=format&fit=crop&q=80&w=800",
-    featured: true
-  },
-  {
-    id: 2,
-    title: "Tech Career Fair: Autumn Edition",
-    date: "NOV 12",
-    time: "10:00 AM - 4:00 PM",
-    location: "Engineering Complex",
-    category: "Career",
-    attendees: 1200,
-    image: "https://images.unsplash.com/photo-1540575861501-7ce05b40a190?auto=format&fit=crop&q=80&w=800",
-    featured: false
-  },
-  {
-    id: 3,
-    title: "Start-up Pitch Competition",
-    date: "NOV 20",
-    time: "2:00 PM - 6:00 PM",
-    location: "Innovation Hub",
-    category: "Workshop",
-    attendees: 150,
-    image: "https://images.unsplash.com/photo-1475721027185-404119d1e1f?auto=format&fit=crop&q=80&w=800",
-    featured: false
-  },
-  {
-    id: 4,
-    title: "Data Science Webinar: Future Trends",
-    date: "DEC 05",
-    time: "7:30 PM - 9:00 PM",
-    location: "Online (Zoom)",
-    category: "Webinar",
-    attendees: 800,
-    image: "https://images.unsplash.com/photo-1591115765373-520b297b8332?auto=format&fit=crop&q=80&w=800",
-    featured: false
-  },
-  {
-    id: 5,
-    title: "Annual Sports Meet & Gala",
-    date: "DEC 15",
-    time: "All Day",
-    location: "University Stadium",
-    category: "Networking",
-    attendees: 2000,
-    image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=800",
-    featured: true
-  }
-];
 
 export default function Events() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [newEvent, setNewEvent] = useState({ title: '', date: '', startTime: '', endTime: '', location: '', category: 'Networking' });
+
+  const handlePropose = async (e) => {
+    e.preventDefault();
+    try {
+      let formattedDate = newEvent.date;
+      if (newEvent.date.includes('-')) {
+        const dateObj = new Date(newEvent.date);
+        const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        formattedDate = `${monthNames[dateObj.getUTCMonth()]} ${String(dateObj.getUTCDate()).padStart(2, '0')}`;
+      }
+
+      const formatTime = (time24) => {
+        if (!time24) return '';
+        let [hours, minutes] = time24.split(':');
+        hours = parseInt(hours, 10);
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `${hours}:${minutes} ${ampm}`;
+      };
+
+      const formattedTime = `${formatTime(newEvent.startTime)} - ${formatTime(newEvent.endTime)}`;
+
+      const payload = { 
+        title: newEvent.title,
+        location: newEvent.location,
+        category: newEvent.category,
+        date: formattedDate,
+        time: formattedTime 
+      };
+
+      const response = await api.post('/events', payload);
+      setEvents([response, ...events]);
+      setShowModal(false);
+      setNewEvent({ title: '', date: '', startTime: '', endTime: '', location: '', category: 'Networking' });
+    } catch (error) {
+      console.error('Error proposing event:', error);
+      alert('Failed to propose event.');
+    }
+  };
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await api.get('/events');
+        setEvents(response);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   const categories = ['All', 'Networking', 'Career', 'Workshop', 'Webinar'];
 
-  const filteredEvents = MOCK_EVENTS.filter(event => {
+  const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || event.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -119,6 +119,7 @@ export default function Events() {
             </motion.div>
 
             <motion.button
+              onClick={() => setShowModal(true)}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.05 }}
@@ -193,8 +194,9 @@ export default function Events() {
                 {/* Image Container */}
                 <div className="h-72 relative overflow-hidden">
                   <motion.img 
-                    src={event.image} 
-                    alt={event.title}
+                    src={event.image || "https://images.unsplash.com/photo-1540575861501-7ce05b40a190?auto=format&fit=crop&q=80&w=800"} 
+                    alt="" 
+                    onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1540575861501-7ce05b40a190?auto=format&fit=crop&q=80&w=800"; }}
                     className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-125"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent opacity-80" />
@@ -250,6 +252,74 @@ export default function Events() {
           </AnimatePresence>
         </motion.div>
       </main>
+
+      {/* Propose Event Modal */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-slate-900 border border-slate-800 p-8 rounded-[2rem] w-full max-w-lg shadow-2xl relative"
+            >
+              <button 
+                onClick={() => setShowModal(false)}
+                className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              
+              <h2 className="text-2xl font-black text-white mb-6 uppercase tracking-tight">Propose New Event</h2>
+              
+              <form onSubmit={handlePropose} className="space-y-4 text-left">
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">Event Title</label>
+                  <input required value={newEvent.title} onChange={e => setNewEvent({...newEvent, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-500 transition-colors" placeholder="e.g. AI Tech Summit" />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">Date</label>
+                    <input type="date" required value={newEvent.date} onChange={e => setNewEvent({...newEvent, date: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-500 transition-colors" />
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="w-1/2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">Start</label>
+                      <input type="time" required value={newEvent.startTime} onChange={e => setNewEvent({...newEvent, startTime: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-500 transition-colors" />
+                    </div>
+                    <div className="w-1/2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">End</label>
+                      <input type="time" required value={newEvent.endTime} onChange={e => setNewEvent({...newEvent, endTime: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-500 transition-colors" />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">Location</label>
+                  <input required value={newEvent.location} onChange={e => setNewEvent({...newEvent, location: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-500 transition-colors" placeholder="e.g. Grand Hall" />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">Category</label>
+                  <select value={newEvent.category} onChange={e => setNewEvent({...newEvent, category: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-500 transition-colors">
+                    {categories.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+
+                <button type="submit" className="w-full py-4 mt-6 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40">
+                  Submit Event
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

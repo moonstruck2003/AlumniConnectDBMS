@@ -14,7 +14,6 @@ import {
   Bookmark
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
 import jobService from '../services/jobService';
 
@@ -68,12 +67,10 @@ const JobDetails = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-row">
-      <Sidebar />
-      <div className="flex-1 lg:ml-[280px]">
-        <Navbar />
-        
-        <main className="max-w-5xl mx-auto px-6 lg:px-10 pt-32 pb-20">
+    <div className="min-h-screen bg-slate-950 flex flex-col">
+      <Navbar />
+      
+      <main className="max-w-5xl mx-auto px-6 lg:px-10 pt-32 pb-20">
           
           <Link to="/jobs" className="inline-flex items-center gap-2 text-slate-500 hover:text-white transition-all font-black text-xs mb-10 group uppercase tracking-widest outline-none">
             <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
@@ -139,23 +136,24 @@ const JobDetails = () => {
             {/* Sidebar Actions */}
             <div className="space-y-8">
                <Card className="!p-8 !bg-slate-900/60 border-t-4 border-t-blue-600 group">
-                  <h5 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-8 leading-none">Global Deployment</h5>
-                  <div className="space-y-4 mb-8">
-                     <div className="flex justify-between items-center bg-slate-950/50 p-4 rounded-2xl border border-slate-800 transition-all group-hover:border-blue-500/20">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active nodes</span>
-                        <span className="text-xs font-black text-white">12 Applicants</span>
-                     </div>
-                     <div className="flex justify-between items-center bg-slate-950/50 p-4 rounded-2xl border border-slate-800 transition-all group-hover:border-blue-500/20">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cycle time</span>
-                        <span className="text-xs font-black text-emerald-400 italic font-medium tracking-tight leading-none">Fast Hiring</span>
-                     </div>
-                  </div>
-                  <Link to={`/jobs/apply/${job.id}`} className="block w-full">
-                     <button className="btn-lavish w-full !bg-blue-600 !text-white flex items-center justify-center gap-3 py-5 text-sm font-black uppercase tracking-tight shadow-xl shadow-blue-600/20 hover:shadow-blue-600/40 transform transition-all group-hover:scale-[1.02]">
-                        Initialize Application
-                        <Zap size={18} className="fill-current" />
-                     </button>
-                  </Link>
+                   <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8 leading-none">Transmission Node</h5>
+                   <div className="space-y-4 mb-8">
+                      <div className="flex flex-col gap-2 bg-slate-950/50 p-6 rounded-2xl border border-slate-800 transition-all group-hover:border-blue-500/20">
+                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Direct Contact</span>
+                         <a 
+                           href={`mailto:${job.contact_email}`} 
+                           className="text-sm font-black text-white hover:text-blue-400 transition-colors truncate"
+                         >
+                            {job.contact_email || "recruit@enterprise.io"}
+                         </a>
+                      </div>
+                   </div>
+                   <Link to={`/jobs/apply/${job.id}`} className="block w-full">
+                      <button className="btn-lavish w-full !bg-blue-600 !text-white flex items-center justify-center gap-3 py-5 text-sm font-black uppercase tracking-tight shadow-xl shadow-blue-600/20 hover:shadow-blue-600/40 transform transition-all group-hover:scale-[1.02]">
+                         Initialize Protocol
+                         <Zap size={18} className="fill-current" />
+                      </button>
+                   </Link>
                </Card>
 
                <div className="grid grid-cols-2 gap-4">
@@ -172,7 +170,6 @@ const JobDetails = () => {
 
           </div>
         </main>
-      </div>
     </div>
   );
 };

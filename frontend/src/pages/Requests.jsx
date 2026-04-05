@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
 import jobService from '../services/jobService';
 import mentorshipService from '../services/mentorshipService';
@@ -59,12 +58,10 @@ const Requests = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-row">
-      <Sidebar />
-      <div className="flex-1 lg:ml-[280px]">
-        <Navbar />
-        
-        <main className="max-w-7xl mx-auto px-6 lg:px-10 pt-32 pb-20">
+    <div className="min-h-screen bg-slate-950 flex flex-col">
+      <Navbar />
+      
+      <main className="max-w-7xl mx-auto px-6 lg:px-10 pt-32 pb-20">
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-slate-800/60 pb-10">
             <div>
@@ -143,7 +140,7 @@ const Requests = () => {
                     animate={{ opacity: 1, x: 0 }} 
                     exit={{ opacity: 0, x: 20 }}
                     className="flex flex-col gap-6"
-                  >
+                   >
                     {mentorReqs.length > 0 ? mentorReqs.map((req) => (
                       <Card key={req.request_id} className="!p-8 !bg-slate-900/60 border-slate-800/40 relative overflow-hidden group hover:border-amber-500/30 transition-all">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
@@ -180,7 +177,6 @@ const Requests = () => {
             )}
           </div>
         </main>
-      </div>
     </div>
   );
 };

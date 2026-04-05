@@ -6,6 +6,7 @@ import './App.css';
 import Navbar from './components/Navbar';
 import Hero from './components/welcome';
 import StatCard from './components/StatCard';
+import authService from './services/authService';
 
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -21,6 +22,8 @@ import Profile from './pages/Profile';
 import Requests from './pages/Requests';
 import Conversations from './pages/Conversations';
 import Messages from './pages/Messages';
+import PostJob from './pages/PostJob';
+import ManageJobs from './pages/ManageJobs';
 
 function Home() {
   const stats = [
@@ -117,6 +120,20 @@ function Home() {
                     </div>
                   </motion.div>
                 </Link>
+
+                {authService.getCurrentUser()?.role?.toLowerCase() === 'recruiter' && (
+                  <Link to="/manage-jobs">
+                    <motion.div whileHover={{ scale: 1.02 }} className="flex justify-between items-center p-5 rounded-2xl bg-slate-900 border border-blue-500/30 cursor-pointer group/action hover:border-blue-500/60 hover:bg-slate-900 transition-all shadow-xl">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-blue-400 group-hover/action:text-blue-300 transition-colors">Manage Postings</span>
+                        <span className="text-xs text-slate-500 mt-1">Control your active jobs</span>
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover/action:bg-blue-500/20 transition-colors">
+                        <Zap className="w-4 h-4 text-blue-400 animate-pulse" />
+                      </div>
+                    </motion.div>
+                  </Link>
+                )}
               </div>
             </motion.div>
           </div>
@@ -140,6 +157,8 @@ function App() {
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/jobs/details/:id" element={<JobDetails />} />
         <Route path="/jobs/apply/:id" element={<ApplyJob />} />
+        <Route path="/post-job" element={<PostJob />} />
+        <Route path="/manage-jobs" element={<ManageJobs />} />
         
         <Route path="/mentorship" element={<Mentorship />} />
         <Route path="/mentorship/request/:id" element={<MentorshipRequest />} />

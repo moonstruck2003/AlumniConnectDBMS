@@ -13,7 +13,6 @@ import {
   MessageSquare
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
 import messageService from '../services/messageService';
 import authService from '../services/authService';
@@ -55,12 +54,10 @@ const Messages = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-row">
-      <Sidebar />
-      <div className="flex-1 lg:ml-[280px]">
-        <Navbar />
-        
-        <main className="max-w-5xl mx-auto px-6 lg:px-10 pt-32 pb-20 h-[calc(100vh-40px)]">
+    <div className="min-h-screen bg-slate-950 flex flex-col">
+      <Navbar />
+      
+      <main className="max-w-5xl mx-auto px-6 lg:px-10 pt-32 pb-20 h-[calc(100vh-40px)]">
           <Card className="flex flex-col !p-0 !bg-slate-900/60 border-slate-800/40 h-full relative overflow-hidden shadow-2xl">
             
             {/* Header */}
@@ -137,7 +134,6 @@ const Messages = () => {
             </div>
           </Card>
         </main>
-      </div>
     </div>
   );
 };

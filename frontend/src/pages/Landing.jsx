@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 import { ArrowRight, BookOpen, Users, Briefcase, GraduationCap } from 'lucide-react';
 
 export default function Landing() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authService.isAuthenticated()) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 

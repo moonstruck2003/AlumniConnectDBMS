@@ -12,7 +12,8 @@ export default function Navbar({ user: propUser }) {
     { name: 'Directory', path: '/alumnidirectory' },
     { name: 'Mentorship', path: '/mentorship' },
     { name: 'Jobs', path: '/jobs' },
-    { name: 'Events', path: '/events' }
+    { name: 'Events', path: '/events' },
+    ...(user?.role?.toLowerCase() === 'recruiter' ? [{ name: 'Manage Postings', path: '/manage-jobs' }] : [])
   ];
 
   return (
