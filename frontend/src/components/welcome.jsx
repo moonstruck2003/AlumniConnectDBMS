@@ -1,6 +1,9 @@
 import { motion } from 'framer-motion';
+import authService from '../services/authService';
 
 export default function Welcome() {
+  const user = authService.getCurrentUser();
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -29,7 +32,7 @@ export default function Welcome() {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-4"
         >
-          Welcome Back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-200 to-amber-500">Alex</span>
+          Welcome Back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-200 to-amber-500">{user?.name || 'User'}</span>
         </motion.h1>
         
         <motion.p 
