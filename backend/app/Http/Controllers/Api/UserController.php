@@ -71,9 +71,16 @@ class UserController extends Controller
 
             DB::commit();
 
+            // Load the full profile and name for the response
+            $user->load('profile');
+            
+            // Create a Sanctum token to auto-login the user
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             return response()->json([
                 'message' => 'Account created successfully!',
-                'user' => $user
+                'user' => $user,
+                'token' => $token
             ], 201);
 
         } catch (\Exception $e) {

@@ -1,9 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { BookOpen, UserCircle, Bell } from 'lucide-react';
+import authService from '../services/authService';
 
-export default function Navbar() {
+export default function Navbar({ user: propUser }) {
   const location = useLocation();
+  const user = propUser || authService.getCurrentUser();
 
   const navLinks = [
     { name: 'Dashboard', path: '/dashboard' },
@@ -64,16 +66,28 @@ export default function Navbar() {
           
           <div className="hidden sm:flex items-center gap-4 pl-6 border-l border-slate-800">
             <div className="text-right">
-              <div className="text-sm font-bold text-slate-200">Alex Student</div>
-              <Link to="/login" className="text-xs text-slate-500 hover:text-amber-400 transition-colors font-medium">Sign Out</Link>
+              <Link to="/profile" className="text-sm font-bold text-slate-200 hover:text-amber-400 transition-colors block">
+                {user?.name || 'User Profile'}
+              </Link>
+              <button 
+                onClick={() => {
+                  authService.logout();
+                  window.location.href = '/login';
+                }} 
+                className="text-xs text-slate-500 hover:text-amber-400 transition-colors font-medium"
+              >
+                Sign Out
+              </button>
             </div>
-            <motion.div 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-800 to-slate-700 border border-slate-600 flex items-center justify-center shadow-lg cursor-pointer text-slate-300 hover:text-white transition-colors"
-            >
-              <UserCircle className="w-6 h-6" />
-            </motion.div>
+            <Link to="/profile">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-800 to-slate-700 border border-slate-600 flex items-center justify-center shadow-lg cursor-pointer text-slate-300 hover:text-white transition-colors"
+              >
+                <UserCircle className="w-6 h-6" />
+              </motion.div>
+            </Link>
           </div>
         </div>
         

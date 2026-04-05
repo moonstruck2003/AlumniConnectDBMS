@@ -1,10 +1,11 @@
 import api from './api';
 
 const userService = {
-  getProfile: (id) => api.get(`/users/${id}`),
-  updateProfile: (id, data) => api.put(`/users/${id}`, data),
+  getProfile: () => api.get('/profile'),
+  updateProfile: (data) => api.put('/profile', data),
   getAlumni: () => api.get('/alumni'),
   getStats: () => api.get('/dashboard/stats'),
+  deleteAccount: () => api.delete('/profile'),
 };
 
 export default userService;

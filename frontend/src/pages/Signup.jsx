@@ -63,6 +63,12 @@ export default function Signup() {
 
       const response = await axios.post('http://127.0.0.1:8000/api/signup', payload);
 
+      // Save the user and token from the response (Auto-Login)
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+
       if (response.status === 201) {
         navigate('/dashboard');
       }
