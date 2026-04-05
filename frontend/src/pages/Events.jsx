@@ -72,6 +72,11 @@ export default function Events() {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || event.category === selectedCategory;
     return matchesSearch && matchesCategory;
+  }).sort((a, b) => {
+    const currentYear = new Date().getFullYear();
+    const dateA = new Date(`${a.date} ${currentYear}`);
+    const dateB = new Date(`${b.date} ${currentYear}`);
+    return dateA - dateB;
   });
 
   const containerVariants = {
@@ -236,16 +241,7 @@ export default function Events() {
                       <Clock className="w-5 h-5 text-slate-700" />
                       {event.time}
                     </div>
-                    <div className="flex items-center gap-4 text-teal-400/60 text-xs font-black uppercase tracking-widest">
-                      <Users className="w-5 h-5" />
-                      {event.attendees}+ Registered
-                    </div>
                   </div>
-
-                  <button className="w-full py-5 bg-slate-950 group-hover:bg-white text-white group-hover:text-slate-950 rounded-[1.8rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all border border-slate-800 group-hover:border-white flex items-center justify-center gap-3 shadow-xl">
-                    Secure Passage
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
                 </div>
               </motion.div>
             ))}
