@@ -17,6 +17,7 @@ class Alumni extends Model
         'user_id',
         'company',
         'job_title',
+        'is_accepting_mentee',
     ];
 
     public function user()

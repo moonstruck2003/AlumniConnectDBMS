@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('alumni', function (Blueprint $table) {
-            //
+            $table->boolean('is_accepting_mentee')->default(true);
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('alumni', function (Blueprint $table) {
-            //
+            $table->dropColumn('is_accepting_mentee');
         });
     }
 };
