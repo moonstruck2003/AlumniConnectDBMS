@@ -17,7 +17,8 @@ import {
   Briefcase,
   GraduationCap,
   Building2,
-  BarChart3
+  BarChart3,
+  Users
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -42,12 +43,18 @@ const Profile = () => {
     department: '',
     company: '',
     job_title: '',
+    is_accepting_mentee: true,
     company_name: ''
   });
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     fetchProfile();
-  }, []);
+  }, [navigate]);
 
   const fetchProfile = async () => {
     try {
@@ -70,6 +77,7 @@ const Profile = () => {
         department: response.user?.student?.department || '',
         company: response.user?.alumni?.company || '',
         job_title: response.user?.alumni?.job_title || '',
+        is_accepting_mentee: response.user?.alumni?.is_accepting_mentee ?? true,
         company_name: response.user?.recruiter?.company_name || ''
       });
     } catch (err) {
@@ -97,7 +105,7 @@ const Profile = () => {
     if (window.confirm("CRITICAL ACTION: Are you sure you want to delete your node from the network? This operation is irreversible.")) {
       try {
         await userService.deleteAccount();
-        authService.logout();
+        await authService.logout();
         navigate('/login');
       } catch (err) {
         console.error("Failed to delete account", err);
@@ -422,6 +430,39 @@ const Profile = () => {
                       </div>
                     )}
                  </section>
+
+                 {/* Mentorship Toggle - ONLY FOR ALUMNI */}
+                 {user?.role === 'alumni' && (
+                    <section className="space-y-6 border-t border-white/5 pt-10">
+                      <div className="flex items-center justify-between p-8 rounded-3xl bg-indigo-500/5 border border-indigo-500/10">
+                        <div className="flex items-center gap-5">
+                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border ${formData.is_accepting_mentee ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-slate-800 border-slate-700'}`}>
+                            <Users className={`w-6 h-6 ${formData.is_accepting_mentee ? 'text-emerald-400' : 'text-slate-500'}`} />
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-black text-white uppercase italic tracking-tight">Mentorship Program</h4>
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
+                              {formData.is_accepting_mentee ? "Currently accepting new mentees" : "Not accepting mentees right now"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {isEditing ? (
+                          <button 
+                            type="button"
+                            onClick={() => setFormData({...formData, is_accepting_mentee: formData.is_accepting_mentee ? 0 : 1})}
+                            className={`px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all border ${formData.is_accepting_mentee ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-slate-950 text-slate-500 border-white/5'}`}
+                          >
+                            {formData.is_accepting_mentee ? "ON" : "OFF"}
+                          </button>
+                        ) : (
+                          <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.3em] border ${formData.is_accepting_mentee ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800/20 text-slate-500 border-slate-800'}`}>
+                            {formData.is_accepting_mentee ? "Active" : "Paused"}
+                          </div>
+                        )}
+                      </div>
+                    </section>
+                  )}
                </div>
             </Card>
           </div>

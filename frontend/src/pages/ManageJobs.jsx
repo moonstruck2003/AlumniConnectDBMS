@@ -114,7 +114,7 @@ export default function ManageJobs() {
               <h3 className="text-3xl font-black text-rose-500 mb-2 tracking-tighter uppercase italic">Access Denied</h3>
               <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-8 max-w-sm mx-auto">{error}</p>
               <button 
-                onClick={() => { authService.logout(); window.location.href='/login'; }}
+                onClick={async () => { await authService.logout(); window.location.href='/login'; }}
                 className="px-10 py-4 bg-white text-slate-950 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-blue-600 hover:text-white transition-all shadow-xl"
               >
                  System Re-Sync (Logout)
@@ -139,7 +139,7 @@ export default function ManageJobs() {
                     Create First Node
                  </Link>
                  <button 
-                   onClick={() => { authService.logout(); window.location.href='/login'; }}
+                   onClick={async () => { await authService.logout(); window.location.href='/login'; }}
                    className="px-10 py-4 bg-slate-800 text-slate-400 hover:text-white font-black uppercase text-xs tracking-widest rounded-2xl transition-all"
                  >
                     System Re-Sync

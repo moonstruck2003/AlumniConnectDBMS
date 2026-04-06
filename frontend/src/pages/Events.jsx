@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Clock, Users, ArrowRight, Filter, Search, PlusCircle, Star, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../services/api';
 import './Events.css';
@@ -52,7 +53,15 @@ export default function Events() {
     }
   };
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
     const fetchEvents = async () => {
       try {
         const response = await api.get('/events');

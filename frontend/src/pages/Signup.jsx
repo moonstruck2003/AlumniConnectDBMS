@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, BookOpen, GraduationCap, Briefcase, ArrowRight, FileText, Building2, Link as LinkIcon, Mail, Lock, Hash } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 export default function Signup() {
   const [role, setRole] = useState('Student');
@@ -61,17 +61,14 @@ export default function Signup() {
         payload.job_title = jobTitle;
       }
 
-      const response = await axios.post('http://127.0.0.1:8000/api/signup', payload);
+      const response = await api.post('/signup', payload);
 
-      // Save the user and token from the response (Auto-Login)
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
       }
 
-      if (response.status === 201) {
-        navigate('/dashboard');
-      }
+      navigate('/dashboard');
     } catch (error) {
       const errorMsg = error.response?.data?.errors 
         ? Object.values(error.response.data.errors).flat().join(', ')

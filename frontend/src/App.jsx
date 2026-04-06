@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/welcome';
 import StatCard from './components/StatCard';
 import authService from './services/authService';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -148,24 +149,24 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/dashboard" element={<Home />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/alumnidirectory" element={<AlumniDirectory />} />
         
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/jobs/details/:id" element={<JobDetails />} />
-        <Route path="/jobs/apply/:id" element={<ApplyJob />} />
-        <Route path="/post-job" element={<PostJob />} />
-        <Route path="/manage-jobs" element={<ManageJobs />} />
+        <Route path="/jobs/apply/:id" element={<ProtectedRoute><ApplyJob /></ProtectedRoute>} />
+        <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />
+        <Route path="/manage-jobs" element={<ProtectedRoute><ManageJobs /></ProtectedRoute>} />
         
         <Route path="/mentorship" element={<Mentorship />} />
-        <Route path="/mentorship/request/:id" element={<MentorshipRequest />} />
+        <Route path="/mentorship/request/:id" element={<ProtectedRoute><MentorshipRequest /></ProtectedRoute>} />
         
-        <Route path="/requests" element={<Requests />} />
-        <Route path="/conversations" element={<Conversations />} />
-        <Route path="/messages/:id" element={<Messages />} />
+        <Route path="/requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
+        <Route path="/conversations" element={<ProtectedRoute><Conversations /></ProtectedRoute>} />
+        <Route path="/messages/:id" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/events" element={<Events />} />
       </Routes>
     </BrowserRouter>
