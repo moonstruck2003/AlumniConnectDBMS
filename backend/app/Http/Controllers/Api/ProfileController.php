@@ -104,9 +104,6 @@ class ProfileController extends Controller
             if ($user->recruiter) $user->recruiter->delete();
             if ($user->profile) $user->profile->delete();
 
-            // Revoke all tokens
-            $user->tokens()->delete();
-
             // Final User teardown
             $user->delete();
 

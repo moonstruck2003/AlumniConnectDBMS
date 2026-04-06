@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
@@ -8,29 +7,30 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\EventController;
 
-// Public routes
+// Public auth
 Route::post('/signup', [UserController::class, 'store']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Protected routes (require Sanctum token)
-Route::middleware('auth:sanctum')->group(function () {
+// Protected (JWT Bearer)
+Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    
-    // Profile Management
+    Route::get('/auth/me', [AuthController::class, 'me']);
+    Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::delete('/profile', [ProfileController::class, 'destroy']);
 
-    // Job Board
+    // Job Routes
     Route::get('/jobs', [JobController::class, 'index']);
     Route::get('/jobs/categories', [JobController::class, 'getCategories']);
+    Route::get('/jobs/{id}', [JobController::class, 'show'])->whereNumber('id');
     Route::post('/jobs', [JobController::class, 'store']);
     Route::get('/jobs/my-jobs', [JobController::class, 'myJobs']);
-    Route::get('/jobs/{id}', [JobController::class, 'show']);
-    Route::post('/jobs/{id}/toggle', [JobController::class, 'toggleStatus']);
-    Route::delete('/jobs/{id}', [JobController::class, 'destroy']);
+    Route::post('/jobs/{id}/toggle', [JobController::class, 'toggleStatus'])->whereNumber('id');
+    Route::delete('/jobs/{id}', [JobController::class, 'destroy'])->whereNumber('id');
 
-    // Events API
+    // Event Routes
     Route::get('/events', [EventController::class, 'index']);
     Route::post('/events', [EventController::class, 'store']);
 });
