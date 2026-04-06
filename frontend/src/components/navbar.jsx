@@ -71,8 +71,9 @@ export default function Navbar({ user: propUser }) {
                 {user?.name || 'User Profile'}
               </Link>
               <button 
-                onClick={() => {
-                  authService.logout();
+                type="button"
+                onClick={async () => {
+                  await authService.logout();
                   window.location.href = '/login';
                 }} 
                 className="text-xs text-slate-500 hover:text-amber-400 transition-colors font-medium"

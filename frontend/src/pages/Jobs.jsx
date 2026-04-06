@@ -17,6 +17,7 @@ import {
   XCircle,
   Tag
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Modal from '../components/Modal';
 import jobService from '../services/jobService';
@@ -36,7 +37,15 @@ export default function Jobs() {
   const user = authService.getCurrentUser();
   const isRecruiter = user?.role === 'recruiter';
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
     const fetchData = async () => {
       try {
         const [jobsData, categoriesData] = await Promise.all([
