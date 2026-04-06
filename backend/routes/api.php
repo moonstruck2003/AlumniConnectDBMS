@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\JobController;
+use App\Http\Controllers\Api\MentorshipController;
 use App\Http\Controllers\EventController;
 
 // Public auth
@@ -33,4 +34,11 @@ Route::middleware('auth:api')->group(function () {
     // Event Routes
     Route::get('/events', [EventController::class, 'index']);
     Route::post('/events', [EventController::class, 'store']);
+
+    // Mentorship Routes
+    Route::get('/mentorships', [MentorshipController::class, 'index']);
+    Route::post('/mentorships/{listingId}/request', [MentorshipController::class, 'storeRequest'])->whereNumber('listingId');
+    Route::get('/mentorships/sent', [MentorshipController::class, 'mySentRequests']);
+    Route::get('/mentorships/incoming', [MentorshipController::class, 'myIncomingRequests']);
+    Route::post('/mentorship-requests/{requestId}/status', [MentorshipController::class, 'updateRequestStatus'])->whereNumber('requestId');
 });

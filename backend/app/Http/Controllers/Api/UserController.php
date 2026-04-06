@@ -8,6 +8,7 @@ use App\Models\UserProfile;
 use App\Models\Student;
 use App\Models\Alumni;
 use App\Models\Recruiter;
+use App\Models\MentorshipListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -50,17 +51,22 @@ class UserController extends Controller
             if ($request->role === 'student') {
                 Student::create([
                     'user_id' => $user->user_id,
-                    // Note: 'student_id' is an auto-increment column in your DB, 
-                    // so we aren't explicitly inserting a string '2024-1-60-XXX' directly here.
                     'department' => $request->department,
                     'cgpa' => $request->cgpa,
                 ]);
             } elseif ($request->role === 'alumni') {
-                Alumni::create([
+                $alumni = Alumni::create([
                     'user_id' => $user->user_id,
                     'company' => $request->company,
                     'job_title' => $request->job_title,
                     'is_accepting_mentee' => true,
+                ]);
+
+                // Automatically create a listing for the mentorship directory
+                MentorshipListing::create([
+                    'alumni_id' => $alumni->alumni_id,
+                    'description' => "I am a {$request->job_title} at {$request->company} and I am looking to mentor students.",
+                    'min_coin_bid' => 0,
                 ]);
             } elseif ($request->role === 'recruiter') {
                 Recruiter::create([
