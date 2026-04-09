@@ -59,8 +59,9 @@ export default function Landing() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-4"
+            className="flex items-center gap-6"
           >
+            <Link to="/alumni" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">Directory</Link>
             <Link 
               to="/login" 
               className="px-5 py-2.5 text-sm font-semibold text-slate-300 hover:text-white transition-colors"

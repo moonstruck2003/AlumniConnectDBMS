@@ -153,7 +153,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/alumnidirectory" element={<AlumniDirectory />} />
+        <Route path="/alumni" element={<AlumniDirectory />} />
         
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/jobs/details/:id" element={<JobDetails />} />

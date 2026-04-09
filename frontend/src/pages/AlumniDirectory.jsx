@@ -54,28 +54,16 @@ const AlumniDirectory = () => {
             }
         };
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/login');
-            return;
-        }
-
         fetchAlumni();
     }, [navigate]);
 
-    const filteredAlumni = React.useMemo(() => {
-        return alumni.filter(alumnu => {
-            const matchesSearch = alumnu.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                alumnu.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                alumnu.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const filteredAlumni = alumni.filter(alumnu => {
+        const matchesSearch = alumnu.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            alumnu.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            alumnu.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-            return matchesSearch;
-        });
-    }, [alumni, searchTerm]);
-
-    const handleSearch = (term) => {
-        setSearchTerm(term);
-    };
+        return matchesSearch;
+    });
 
     const handleViewProfile = (id) => {
         const selected = alumni.find(a => a.id === id);
@@ -130,7 +118,7 @@ const AlumniDirectory = () => {
                         className="flex flex-col md:flex-row items-center gap-4 p-2 rounded-[2.5rem] bg-slate-900/30 backdrop-blur-3xl border border-white/5 shadow-2xl max-w-2xl mx-auto group/search focus-within:border-blue-500/50 transition-all"
                     >
                         <div className="flex-1 flex items-center gap-3 px-6 py-3">
-                            <Search className="w-5 h-5 text-slate-500 group-focus-within/search:text-blue-500 transition-colors" />
+                            <Search className="w-5 h-5 text-slate-500 group-focus-within:text-blue-500 transition-colors" />
                             <input 
                                 type="text" 
                                 placeholder="Search by name, company, or role..." 
@@ -155,21 +143,15 @@ const AlumniDirectory = () => {
                     </p>
                 </div>
 
-                {loading ? (
-                    <div className="flex justify-center py-40">
-                        <div className="w-12 h-12 border-4 border-blue-500/10 border-t-blue-500 rounded-full animate-spin" />
-                    </div>
-                ) : (
-                    <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredAlumni.map(alumnus => (
-                            <AlumniCard 
-                                key={alumnus.id} 
-                                {...alumnus} 
-                                onViewProfile={handleViewProfile}
-                            />
-                        ))}
-                    </motion.div>
-                )}
+                <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredAlumni.map(alumnus => (
+                        <AlumniCard 
+                            key={alumnus.id} 
+                            {...alumnus} 
+                            onViewProfile={handleViewProfile}
+                        />
+                    ))}
+                </motion.div>
             </motion.div>
 
             <AlumniProfileModal 

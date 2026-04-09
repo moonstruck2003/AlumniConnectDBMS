@@ -9,7 +9,7 @@ export default function Navbar({ user: propUser }) {
 
   const navLinks = [
     { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Directory', path: '/alumnidirectory' },
+    { name: 'Directory', path: '/alumni' },
     { name: 'Mentorship', path: '/mentorship' },
     { name: 'Jobs', path: '/jobs' },
     { name: 'Events', path: '/events' },

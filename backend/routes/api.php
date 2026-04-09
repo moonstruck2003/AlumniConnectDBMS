@@ -9,9 +9,11 @@ use App\Http\Controllers\Api\MentorshipController;
 use App\Http\Controllers\Api\AlumniController;
 use App\Http\Controllers\EventController;
 
-// Public auth
+// Public routes
 Route::post('/signup', [UserController::class, 'store']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/alumni', [AlumniController::class, 'index']);
+Route::get('/alumni/{id}', [AlumniController::class, 'show'])->whereNumber('id');
 
 // Protected (JWT Bearer)
 Route::middleware('auth:api')->group(function () {
@@ -42,8 +44,4 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/mentorships/sent', [MentorshipController::class, 'mySentRequests']);
     Route::get('/mentorships/incoming', [MentorshipController::class, 'myIncomingRequests']);
     Route::post('/mentorship-requests/{requestId}/status', [MentorshipController::class, 'updateRequestStatus'])->whereNumber('requestId');
-
-    // Alumni Directory
-    Route::get('/alumni', [AlumniController::class, 'index']);
-    Route::get('/alumni/{id}', [AlumniController::class, 'show'])->whereNumber('id');
 });

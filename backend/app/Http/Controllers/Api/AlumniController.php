@@ -11,15 +11,13 @@ class AlumniController extends Controller
     /**
      * Display a listing of all alumni.
      */
+    /**
+     * Display a listing of all alumni.
+     */
     public function index()
     {
-        // Optimized query: select only required columns to reduce memory/network overhead
         $alumni = User::where('role', 'alumni')
-            ->select(['user_id', 'email'])
-            ->with([
-                'profile:user_id,first_name,last_name,bio,linkedin_url', 
-                'alumni:user_id,job_title,company,is_accepting_mentee'
-            ])
+            ->with(['profile', 'alumni'])
             ->get();
 
         return response()->json([
