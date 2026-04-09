@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\MentorshipController;
+use App\Http\Controllers\Api\AlumniController;
 use App\Http\Controllers\EventController;
 
 // Public auth
@@ -41,4 +42,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/mentorships/sent', [MentorshipController::class, 'mySentRequests']);
     Route::get('/mentorships/incoming', [MentorshipController::class, 'myIncomingRequests']);
     Route::post('/mentorship-requests/{requestId}/status', [MentorshipController::class, 'updateRequestStatus'])->whereNumber('requestId');
+
+    // Alumni Directory
+    Route::get('/alumni', [AlumniController::class, 'index']);
+    Route::get('/alumni/{id}', [AlumniController::class, 'show'])->whereNumber('id');
 });

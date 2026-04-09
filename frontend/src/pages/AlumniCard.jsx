@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, MapPin, GraduationCap } from 'lucide-react';
 
-const AlumniCard = ({ initials, name, title, company, location, year, isMentor }) => {
+const AlumniCard = ({ id, initials, name, title, company, location, year, isMentor, onViewProfile }) => {
     return (
         <motion.div 
             whileHover={{ y: -6, scale: 1.02 }}
@@ -49,7 +49,13 @@ const AlumniCard = ({ initials, name, title, company, location, year, isMentor }
             </div>
             
             <div className="relative z-10 w-full pt-4 border-t border-slate-800 flex justify-end mt-auto">
-                <button className="px-5 py-2 rounded-xl font-semibold text-xs uppercase tracking-widest text-slate-300 hover:text-slate-950 hover:bg-white transition-colors border border-slate-700 hover:border-white">
+                <button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onViewProfile(id);
+                    }}
+                    className="px-5 py-2 rounded-xl font-semibold text-xs uppercase tracking-widest text-slate-300 hover:text-slate-950 hover:bg-white transition-colors border border-slate-700 hover:border-white"
+                >
                     View Profile
                 </button>
             </div>

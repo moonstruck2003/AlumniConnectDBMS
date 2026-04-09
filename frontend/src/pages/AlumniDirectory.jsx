@@ -5,6 +5,8 @@ import Navbar from '../components/Navbar';
 import AlumniCard from './AlumniCard';
 import SearchFilter from './SearchFilter';
 import FilterModal from '../components/FilterModal';
+import AlumniProfileModal from '../components/AlumniProfileModal';
+import alumniService from '../services/alumniService';
 import './AlumniDirectory.css';
 
 const AlumniDirectory = () => {
@@ -14,26 +16,59 @@ const AlumniDirectory = () => {
     const [industry, setIndustry] = useState('All Industries');
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedAlumni, setSelectedAlumni] = useState(null);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
+        const fetchAlumni = async () => {
+            try {
+                const response = await alumniService.getAllAlumni();
+                // Map DB structure to frontend props
+                const mappedAlumni = response.alumni.map(item => ({
+                    id: item.user_id,
+                    initials: `${item.profile?.first_name?.[0] || 'A'}${item.profile?.last_name?.[0] || 'M'}`,
+                    name: `${item.profile?.first_name || 'Alumni'} ${item.profile?.last_name || 'Member'}`,
+                    title: item.alumni?.job_title || 'Professional',
+                    company: item.alumni?.company || 'N/A',
+                    location: 'Network Node',
+                    year: '2020+', 
+                    isMentor: !!item.alumni?.is_accepting_mentee,
+                    industry: 'Technology',
+                    profile: item.profile,
+                    alumni: item.alumni,
+                    email: item.email
+                }));
+
+                const defaultAlumni = [
+                    { id: 'd1', initials: 'SJ', name: 'Sarah Johnson', title: 'Senior Software Engineer', company: 'Google', location: 'Mountain View, CA', year: 2018, isMentor: true, industry: 'Technology', profile: { first_name: 'Sarah', last_name: 'Johnson', bio: 'Senior Engineer at Google.' }, alumni: { job_title: 'Senior Software Engineer', company: 'Google' }, email: 'sarah@google.com' },
+                    { id: 'd2', initials: 'MC', name: 'Michael Chen', title: 'Product Manager', company: 'Microsoft', location: 'Seattle, WA', year: 2015, isMentor: true, industry: 'Technology', profile: { first_name: 'Michael', last_name: 'Chen', bio: 'PM at Microsoft.' }, alumni: { job_title: 'Product Manager', company: 'Microsoft' }, email: 'michael@microsoft.com' },
+                ];
+
+                const finalAlumni = mappedAlumni.length > 0 ? mappedAlumni : defaultAlumni;
+
+                setAlumni(finalAlumni);
+                setFilteredAlumni(finalAlumni);
+            } catch (err) {
+                console.error("Failed to fetch alumni", err);
+                // Fallback on error
+                const defaultAlumni = [
+                    { id: 'd1', initials: 'SJ', name: 'Sarah Johnson', title: 'Senior Software Engineer', company: 'Google', location: 'Mountain View, CA', year: 2018, isMentor: true, industry: 'Technology', profile: { first_name: 'Sarah', last_name: 'Johnson', bio: 'Senior Engineer at Google.' }, alumni: { job_title: 'Senior Software Engineer', company: 'Google' }, email: 'sarah@google.com' },
+                    { id: 'd2', initials: 'MC', name: 'Michael Chen', title: 'Product Manager', company: 'Microsoft', location: 'Seattle, WA', year: 2015, isMentor: true, industry: 'Technology', profile: { first_name: 'Michael', last_name: 'Chen', bio: 'PM at Microsoft.' }, alumni: { job_title: 'Product Manager', company: 'Microsoft' }, email: 'michael@microsoft.com' },
+                ];
+                setAlumni(defaultAlumni);
+                setFilteredAlumni(defaultAlumni);
+            }
+        };
+
         const token = localStorage.getItem('token');
         if (!token) {
             navigate('/login');
             return;
         }
 
-        const mockAlumni = [
-            { id: 1, initials: 'SJ', name: 'Sarah Johnson', title: 'Senior Software Engineer', company: 'Google', location: 'Mountain View, CA', year: 2018, isMentor: true, industry: 'Technology' },
-            { id: 2, initials: 'MC', name: 'Michael Chen', title: 'Product Manager', company: 'Microsoft', location: 'Seattle, WA', year: 2015, isMentor: true, industry: 'Technology' },
-            { id: 3, initials: 'ER', name: 'Emily Rodriguez', title: 'Marketing Director', company: 'Coca-Cola', location: 'Atlanta, GA', year: 2019, isMentor: false, industry: 'Marketing' },
-            { id: 4, initials: 'DK', name: 'David Kim', title: 'Investment Banker', company: 'Goldman Sachs', location: 'New York, NY', year: 2017, isMentor: true, industry: 'Finance' },
-            { id: 5, initials: 'JW', name: 'Jessica Wang', title: 'ML Engineer', company: 'Google', location: 'Mountain View, CA', year: 2020, isMentor: true, industry: 'Technology' },
-            { id: 6, initials: 'RT', name: 'Robert Taylor', title: 'Engineering Manager', company: 'Apple', location: 'Cupertino, CA', year: 2016, isMentor: false, industry: 'Technology' },
-        ];
-        setAlumni(mockAlumni);
-        setFilteredAlumni(mockAlumni);
-    }, []);
+        fetchAlumni();
+    }, [navigate]);
 
     const applyFilters = () => {
         let filtered = alumni.filter(alumnus => {
@@ -63,6 +98,14 @@ const AlumniDirectory = () => {
 
     const handleMentorFilter = (checked) => {
         setMentorsOnly(checked);
+    };
+
+    const handleViewProfile = (id) => {
+        const selected = alumni.find(a => a.id === id);
+        if (selected) {
+            setSelectedAlumni(selected);
+            setIsProfileOpen(true);
+        }
     };
 
     const containerVariants = {
@@ -98,7 +141,7 @@ const AlumniDirectory = () => {
                         industry={industry}
                         mentorsOnly={mentorsOnly}
                         onIndustryChange={handleIndustryChange}
-                        onMentorChange={setMentorsOnly}
+                        onMentorChange={handleMentorFilter}
                         onApply={applyFilters}
                         onClose={() => setShowFilterModal(false)}
                     />
@@ -112,10 +155,20 @@ const AlumniDirectory = () => {
 
                 <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredAlumni.map(alumnus => (
-                        <AlumniCard key={alumnus.id} {...alumnus} />
+                        <AlumniCard 
+                            key={alumnus.id} 
+                            {...alumnus} 
+                            onViewProfile={handleViewProfile}
+                        />
                     ))}
                 </motion.div>
             </motion.div>
+
+            <AlumniProfileModal 
+                alumni={selectedAlumni}
+                isOpen={isProfileOpen}
+                onClose={() => setIsProfileOpen(false)}
+            />
         </div>
     );
 };
