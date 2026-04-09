@@ -68,15 +68,16 @@ export default function Jobs() {
     }
   };
 
-  const filteredJobs = jobs.filter(job => {
-    const matchesSearch = job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          (job.company_name && job.company_name.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    // Type match
-    const matchesType = selectedType === 'All' || job.job_type === selectedType;
-    
-    return matchesSearch && matchesType;
-  });
+  const filteredJobs = React.useMemo(() => {
+    return jobs.filter(job => {
+      const matchesSearch = job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            (job.company_name && job.company_name.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesType = selectedType === 'All' || job.job_type === selectedType;
+      
+      return matchesSearch && matchesType;
+    });
+  }, [jobs, searchTerm, selectedType]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

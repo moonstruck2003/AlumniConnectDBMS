@@ -13,8 +13,13 @@ class AlumniController extends Controller
      */
     public function index()
     {
+        // Optimized query: select only required columns to reduce memory/network overhead
         $alumni = User::where('role', 'alumni')
-            ->with(['profile', 'alumni'])
+            ->select(['user_id', 'email'])
+            ->with([
+                'profile:user_id,first_name,last_name,bio,linkedin_url', 
+                'alumni:user_id,job_title,company,is_accepting_mentee'
+            ])
             ->get();
 
         return response()->json([

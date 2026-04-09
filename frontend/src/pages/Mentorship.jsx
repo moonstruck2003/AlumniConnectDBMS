@@ -32,21 +32,6 @@ const Mentorship = () => {
     const isStudent = user?.role === 'student';
     const isAlumni = user?.role === 'alumni';
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/login');
-            return;
-        }
-        
-        // Default tab for alumni
-        if (isAlumni) {
-            setActiveTab('incoming');
-        }
-
-        fetchData();
-    }, [navigate]);
-
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -67,10 +52,15 @@ const Mentorship = () => {
         }
     };
 
-    // Refetch when tab changes
     useEffect(() => {
-        if (!loading) fetchData();
-    }, [activeTab]);
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+
+        fetchData();
+    }, [navigate, activeTab]);
 
     const handleStatusUpdate = async (requestId, status) => {
         try {
@@ -92,12 +82,13 @@ const Mentorship = () => {
         visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
     };
 
-    const tabs = isStudent ? [
+    const tabs = [
         { id: 'find', label: 'Explore Mentors', icon: Search },
-        { id: 'sent', label: 'My Sent Requests', icon: MessageSquare }
-    ] : [
-        { id: 'incoming', label: 'Incoming Requests', icon: Inbox },
-        { id: 'manage', label: 'Active Mentees', icon: UserCheck }
+        ...(isStudent ? [{ id: 'sent', label: 'My Sent Requests', icon: MessageSquare }] : []),
+        ...(isAlumni ? [
+            { id: 'incoming', label: 'Incoming Requests', icon: Inbox },
+            { id: 'manage', label: 'Active Mentees', icon: UserCheck }
+        ] : [])
     ];
 
     return (
@@ -159,15 +150,15 @@ const Mentorship = () => {
                                 exit={{ opacity: 0, y: -10 }}
                                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                             >
-                                {listings.map(listing => (
+                                {listings.map(mentor => (
                                     <MentorCard 
-                                      key={listing.listing_id} 
-                                      id={listing.listing_id}
-                                      name={`${listing.alumni?.user?.profile?.first_name} ${listing.alumni?.user?.profile?.last_name}`}
-                                      initials={`${listing.alumni?.user?.profile?.first_name?.charAt(0)}${listing.alumni?.user?.profile?.last_name?.charAt(0)}`}
-                                      title={listing.alumni?.job_title}
-                                      company={listing.alumni?.company}
-                                      description={listing.description}
+                                      key={mentor.listing_id} 
+                                      id={mentor.listing_id}
+                                      name={`${mentor.alumni?.user?.profile?.first_name} ${mentor.alumni?.user?.profile?.last_name}`}
+                                      initials={`${mentor.alumni?.user?.profile?.first_name?.charAt(0)}${mentor.alumni?.user?.profile?.last_name?.charAt(0)}`}
+                                      title={mentor.alumni?.job_title}
+                                      company={mentor.alumni?.company}
+                                      description={mentor.description}
                                       expertise={['Mentorship', 'Career Growth']}
                                       isStudent={isStudent}
                                     />

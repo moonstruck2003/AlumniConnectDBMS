@@ -16,7 +16,15 @@ class JobController extends Controller
      */
     public function index(Request $request)
     {
-        $query = JobListing::with(['category', 'recruiter']);
+        // Optimized query: select only summary fields, skip heavy description for list view
+        $query = JobListing::select([
+            'job_id', 'recruiter_id', 'category_id', 'job_title', 
+            'company_name', 'job_type', 'location', 'salary', 
+            'deadline', 'is_active', 'created_at'
+        ])->with([
+            'category:category_id,category_name', 
+            'recruiter:recruiter_id,company_name'
+        ]);
 
         // Filtering by job type (Job or Internship)
         if ($request->has('job_type') && $request->job_type !== 'all') {
