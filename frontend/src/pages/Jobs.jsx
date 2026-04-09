@@ -26,10 +26,8 @@ import './Jobs.css';
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedType, setSelectedType] = useState('All');
   const [selectedJob, setSelectedJob] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,12 +46,8 @@ export default function Jobs() {
 
     const fetchData = async () => {
       try {
-        const [jobsData, categoriesData] = await Promise.all([
-          jobService.getJobs(),
-          jobService.getCategories()
-        ]);
+        const jobsData = await jobService.getJobs();
         setJobs(jobsData);
-        setCategories(['All', ...categoriesData.map(c => c.category_name)]);
       } catch (err) {
         console.error('Failed to fetch data', err);
       } finally {
@@ -78,13 +72,10 @@ export default function Jobs() {
     const matchesSearch = job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           (job.company_name && job.company_name.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    // Category match
-    const matchesCategory = selectedCategory === 'All' || job.category?.category_name === selectedCategory;
-    
     // Type match
     const matchesType = selectedType === 'All' || job.job_type === selectedType;
     
-    return matchesSearch && matchesCategory && matchesType;
+    return matchesSearch && matchesType;
   });
 
   const containerVariants = {
@@ -99,7 +90,7 @@ export default function Jobs() {
     <div className="jobs-page bg-slate-950 min-h-screen text-slate-100 pb-20 selection:bg-blue-500/30">
       <Navbar />
       
-      {/* Compact Hero Section */}
+      {/* Standardized Hero & Search Section */}
       <section className="relative pt-24 pb-12 overflow-hidden border-b border-slate-800/50">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-blue-600/5 via-transparent to-transparent pointer-events-none" />
         
@@ -108,7 +99,7 @@ export default function Jobs() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-center space-y-4"
+            className="text-center space-y-4 mb-10"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-black tracking-[0.2em] uppercase">
               <Briefcase className="w-3.5 h-3.5" />
@@ -122,122 +113,49 @@ export default function Jobs() {
             </p>
           </motion.div>
 
-          {/* Search Bar */}
-          <div className="max-w-4xl mx-auto mt-10 flex flex-col md:flex-row gap-4">
-             <motion.div 
+          {/* Unified Search and Filtering Bar */}
+          <div className="max-w-4xl mx-auto">
+            <motion.div 
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ delay: 0.2, duration: 0.8 }}
-               className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 p-2 rounded-[2rem] bg-slate-900/40 backdrop-blur-3xl border border-white/10 shadow-2xl group/search focus-within:border-blue-500/50 transition-all"
-             >
-               <div className="flex items-center gap-3 px-5 py-3">
-                 <Search className="w-5 h-5 text-slate-500 group-focus-within/search:text-blue-400 transition-colors" />
-                 <input 
-                   type="text" 
-                   placeholder="Search legacy-defining roles..." 
-                   value={searchTerm}
-                   onChange={(e) => setSearchTerm(e.target.value)}
-                   className="w-full bg-transparent border-none outline-none text-lg placeholder-slate-700 font-semibold"
-                 />
-               </div>
-               <button className="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-[1.5rem] font-black transition-all shadow-lg flex items-center gap-2 uppercase tracking-wider text-[10px]">
-                 <Zap className="w-4 h-4 fill-current" />
-                 Discover
-               </button>
-             </motion.div>
-
-             {isRecruiter && (
-                <Link to="/post-job" className="md:w-auto w-full">
-                   <motion.button 
-                     whileHover={{ scale: 1.05 }}
-                     whileTap={{ scale: 0.95 }}
-                     className="w-full h-full px-8 py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-[2rem] font-black flex items-center justify-center gap-3 shadow-xl shadow-emerald-600/20 uppercase tracking-widest text-[10px]"
-                   >
-                     <Plus className="w-5 h-5" />
-                     Post Opportunity
-                   </motion.button>
+               className="flex flex-col md:flex-row items-center gap-4 p-2 rounded-[2.5rem] bg-slate-900/40 backdrop-blur-3xl border border-white/10 shadow-2xl w-full group/search focus-within:border-blue-500/50 transition-all"
+            >
+              <div className="flex-1 flex items-center gap-3 px-6 py-3">
+                <Search className="w-5 h-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                <input 
+                  type="text" 
+                  placeholder="Search legacy-defining roles..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-transparent border-none outline-none text-lg placeholder-slate-700 font-semibold"
+                />
+              </div>
+              
+              {isRecruiter ? (
+                <Link to="/post-job" className="shrink-0">
+                    <motion.button 
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-[1.8rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-lg flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Post Opportunity
+                    </motion.button>
                 </Link>
-             )}
+              ) : (
+                <button className="px-10 py-4 bg-blue-600 hover:bg-blue-500 rounded-[1.8rem] font-black transition-all shadow-lg flex items-center gap-2 uppercase tracking-wider text-[10px]">
+                  <Zap className="w-4 h-4 fill-current" />
+                  Discover
+                </button>
+              )}
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16 mt-16">
-        {/* Filters Sidebar */}
-        <aside className="hidden lg:block">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="sticky top-32 space-y-12 p-8 rounded-[2.5rem] bg-slate-900/30 border border-white/5 backdrop-blur-xl"
-          >
-            <div className="space-y-8">
-              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] flex items-center gap-3">
-                <Filter className="w-4 h-4" />
-                Specializations
-              </h4>
-              <div className="flex flex-col gap-3">
-                {categories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-6 py-4 rounded-2xl text-left font-black text-xs uppercase tracking-widest transition-all relative overflow-hidden group/cat ${
-                      selectedCategory === cat 
-                      ? 'text-blue-400' 
-                      : 'text-slate-500 hover:text-slate-100'
-                    }`}
-                  >
-                    {selectedCategory === cat && (
-                      <motion.div 
-                        layoutId="cat-bg"
-                        className="absolute inset-0 bg-blue-500/10 border border-blue-500/20"
-                        style={{ borderRadius: '1rem' }}
-                      />
-                    )}
-                    <span className="relative z-10">{cat}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-8 pt-8 border-t border-slate-800/50">
-               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] flex items-center gap-3">
-                 <Tag className="w-4 h-4" />
-                 Classification
-               </h4>
-               <div className="grid grid-cols-2 gap-2">
-                  {['All', 'Job', 'Internship'].map(type => (
-                     <button
-                       key={type}
-                       onClick={() => setSelectedType(type)}
-                       className={`px-4 py-3 rounded-xl border font-black text-[9px] uppercase tracking-widest transition-all ${
-                         selectedType === type
-                         ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
-                         : 'bg-slate-950/50 border-slate-800 text-slate-600 hover:text-slate-400'
-                       }`}
-                     >
-                       {type}
-                     </button>
-                  ))}
-               </div>
-            </div>
-
-            <div className="p-8 rounded-[2rem] bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/20 space-y-6 relative overflow-hidden group/cta">
-              <div className="absolute -right-4 -bottom-4 opacity-10 group-hover/cta:scale-110 transition-transform">
-                <Briefcase className="w-32 h-32" />
-              </div>
-              <h5 className="font-black text-white text-lg tracking-tight relative z-10 italic">Expand the legacy?</h5>
-              <p className="text-sm text-blue-200/60 leading-relaxed font-semibold relative z-10 italic">Recruit top-tier talent from our elite alumni network.</p>
-              <button className="w-full py-4 bg-white/10 hover:bg-white text-slate-400 hover:text-slate-950 rounded-2xl font-black transition-all border border-white/10 text-[10px] uppercase tracking-widest relative z-10">
-                Launch Posting
-              </button>
-            </div>
-          </motion.div>
-        </aside>
-
-        {/* Job Listings Grid */}
-        <div className="space-y-10">
+      <main className="max-w-7xl mx-auto px-6 mt-16 pb-20">
           <div className="flex items-center justify-between">
             <p className="text-slate-500 text-sm font-black uppercase tracking-[0.2em]">
               Curated List / <span className="text-slate-100">{filteredJobs.length}</span> Opportunities
@@ -390,9 +308,8 @@ export default function Jobs() {
                 <p className="text-slate-600 font-bold uppercase tracking-widest text-xs">Adjust your frequency to discover new opportunities.</p>
              </div>
           )}
-        </div>
-      </main>
-    </div>
-  );
+        </main>
+      </div>
+    );
 }
 
