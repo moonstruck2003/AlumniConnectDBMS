@@ -115,7 +115,7 @@ const AlumniProfileModal = ({ alumni, isOpen, onClose }) => {
                                         whileTap={{ scale: 0.98 }}
                                         className="mt-6 w-full py-4 bg-white text-slate-950 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-white/5 hover:bg-slate-100 transition-all"
                                     >
-                                        Connect via Chat
+                                        Connect
                                     </motion.button>
                                 </div>
                             </div>
