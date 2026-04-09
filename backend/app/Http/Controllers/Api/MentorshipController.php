@@ -16,21 +16,33 @@ class MentorshipController extends Controller
      */
     public function index()
     {
-        // Fetch all listings with alumni data, but filtered by alumni who are currently accepting mentees
-        $listings = MentorshipListing::with(['alumni.user.profile'])
-            ->whereHas('alumni', function($query) {
-                $query->where('is_accepting_mentee', true);
-            })
+        // Fetch all alumni who are accepting mentees, with specific column selection
+        $alumni = Alumni::where('is_accepting_mentee', true)
+            ->select(['alumni_id', 'user_id', 'job_title', 'company'])
+            ->with([
+                'user:user_id,email', 
+                'user.profile:user_id,first_name,last_name,bio'
+            ])
             ->latest()
             ->get();
 
-        return response()->json($listings);
+        // Map to a consistent "Mentor" object that the frontend expects
+        $mentors = $alumni->map(function($alumnus) {
+            return [
+                'listing_id' => $alumnus->alumni_id, // Map alumni_id to listing_id for frontend compatibility
+                'alumni_id' => $alumnus->alumni_id,
+                'description' => $alumnus->user->profile->bio ?? "Hi! I'm an alumni willing to mentor students. Feel free to connect!",
+                'alumni' => $alumnus
+            ];
+        });
+
+        return response()->json($mentors);
     }
 
     /**
      * Student submits a request for mentorship.
      */
-    public function storeRequest(Request $request, $listingId)
+    public function storeRequest(Request $request, $alumniId)
     {
         $user = $request->user();
 
@@ -42,19 +54,23 @@ class MentorshipController extends Controller
             'message' => 'nullable|string|max:1000',
         ]);
 
-        $listing = MentorshipListing::findOrFail($listingId);
+        // Find or create a default listing for this alumni so the request table remains consistent
+        $listing = MentorshipListing::firstOrCreate(
+            ['alumni_id' => $alumniId],
+            ['description' => 'Default Mentorship Listing', 'min_coin_bid' => 0]
+        );
 
         // Check if already requested
-        $existing = MentorshipRequest::where('listing_id', $listingId)
+        $existing = MentorshipRequest::where('listing_id', $listing->listing_id)
             ->where('student_id', $user->student->student_id)
             ->first();
 
         if ($existing) {
-            return response()->json(['message' => 'You have already requested mentorship for this listing.'], 400);
+            return response()->json(['message' => 'You have already requested mentorship from this mentor.'], 400);
         }
 
         $mentorshipRequest = MentorshipRequest::create([
-            'listing_id' => $listingId,
+            'listing_id' => $listing->listing_id,
             'student_id' => $user->student->student_id,
             'message' => $request->message,
             'status' => 'Pending',

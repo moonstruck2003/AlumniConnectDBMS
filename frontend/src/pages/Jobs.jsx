@@ -74,18 +74,17 @@ export default function Jobs() {
     }
   };
 
-  const filteredJobs = jobs.filter(job => {
-    const matchesSearch = job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          (job.company_name && job.company_name.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    // Category match
-    const matchesCategory = selectedCategory === 'All' || job.category?.category_name === selectedCategory;
-    
-    // Type match
-    const matchesType = selectedType === 'All' || job.job_type === selectedType;
-    
-    return matchesSearch && matchesCategory && matchesType;
-  });
+  const filteredJobs = React.useMemo(() => {
+    return jobs.filter(job => {
+      const matchesSearch = job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            (job.company_name && job.company_name.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesCategory = selectedCategory === 'All' || job.category?.category_name === selectedCategory;
+      const matchesType = selectedType === 'All' || job.job_type === selectedType;
+      
+      return matchesSearch && matchesCategory && matchesType;
+    });
+  }, [jobs, searchTerm, selectedCategory, selectedType]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

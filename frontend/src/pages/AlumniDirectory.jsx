@@ -11,7 +11,6 @@ import './AlumniDirectory.css';
 
 const AlumniDirectory = () => {
     const [alumni, setAlumni] = useState([]);
-    const [filteredAlumni, setFilteredAlumni] = useState([]);
     const [mentorsOnly, setMentorsOnly] = useState(false);
     const [industry, setIndustry] = useState('All Industries');
     const [showFilterModal, setShowFilterModal] = useState(false);
@@ -48,7 +47,6 @@ const AlumniDirectory = () => {
                 const finalAlumni = mappedAlumni.length > 0 ? mappedAlumni : defaultAlumni;
 
                 setAlumni(finalAlumni);
-                setFilteredAlumni(finalAlumni);
             } catch (err) {
                 console.error("Failed to fetch alumni", err);
                 // Fallback on error
@@ -57,7 +55,6 @@ const AlumniDirectory = () => {
                     { id: 'd2', initials: 'MC', name: 'Michael Chen', title: 'Product Manager', company: 'Microsoft', location: 'Seattle, WA', year: 2015, isMentor: true, industry: 'Technology', profile: { first_name: 'Michael', last_name: 'Chen', bio: 'PM at Microsoft.' }, alumni: { job_title: 'Product Manager', company: 'Microsoft' }, email: 'michael@microsoft.com' },
                 ];
                 setAlumni(defaultAlumni);
-                setFilteredAlumni(defaultAlumni);
             }
         };
 
@@ -70,8 +67,8 @@ const AlumniDirectory = () => {
         fetchAlumni();
     }, [navigate]);
 
-    const applyFilters = () => {
-        let filtered = alumni.filter(alumnus => {
+    const filteredAlumni = React.useMemo(() => {
+        return alumni.filter(alumnus => {
             const matchesSearch = alumnus.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 alumnus.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 alumnus.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -81,15 +78,10 @@ const AlumniDirectory = () => {
 
             return matchesSearch && matchesIndustry && matchesMentor;
         });
-
-        setFilteredAlumni(filtered);
-        setShowFilterModal(false);
-    };
+    }, [alumni, searchTerm, industry, mentorsOnly]);
 
     const handleSearch = (term) => {
         setSearchTerm(term);
-        // Apply filters after search term changes
-        setTimeout(() => applyFilters(), 0);
     };
 
     const handleIndustryChange = (selectedIndustry) => {
@@ -142,7 +134,7 @@ const AlumniDirectory = () => {
                         mentorsOnly={mentorsOnly}
                         onIndustryChange={handleIndustryChange}
                         onMentorChange={handleMentorFilter}
-                        onApply={applyFilters}
+                        onApply={() => setShowFilterModal(false)}
                         onClose={() => setShowFilterModal(false)}
                     />
                 )}
