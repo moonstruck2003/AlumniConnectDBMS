@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\MentorshipController;
 use App\Http\Controllers\Api\AlumniController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\MessageController;
 
 // Public routes
 Route::post('/signup', [UserController::class, 'store']);
@@ -44,4 +45,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/mentorships/sent', [MentorshipController::class, 'mySentRequests']);
     Route::get('/mentorships/incoming', [MentorshipController::class, 'myIncomingRequests']);
     Route::post('/mentorship-requests/{requestId}/status', [MentorshipController::class, 'updateRequestStatus'])->whereNumber('requestId');
+
+    // Messaging Routes
+    Route::get('/messages/conversations', [MessageController::class, 'getConversations']);
+    Route::get('/messages/{userId}', [MessageController::class, 'getConversation']);
+    Route::post('/messages', [MessageController::class, 'sendMessage']);
 });

@@ -154,6 +154,7 @@ const Mentorship = () => {
                                     <MentorCard 
                                       key={mentor.listing_id} 
                                       id={mentor.listing_id}
+                                      userId={mentor.alumni?.user_id}
                                       name={`${mentor.alumni?.user?.profile?.first_name} ${mentor.alumni?.user?.profile?.last_name}`}
                                       initials={`${mentor.alumni?.user?.profile?.first_name?.charAt(0)}${mentor.alumni?.user?.profile?.last_name?.charAt(0)}`}
                                       title={mentor.alumni?.job_title}
@@ -161,6 +162,7 @@ const Mentorship = () => {
                                       description={mentor.description}
                                       expertise={['Mentorship', 'Career Growth']}
                                       isStudent={isStudent}
+                                      isConnected={mentor.is_connected}
                                     />
                                 ))}
                                 {listings.length === 0 && (

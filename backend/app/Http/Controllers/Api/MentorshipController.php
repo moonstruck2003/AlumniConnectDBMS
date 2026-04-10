@@ -26,13 +26,29 @@ class MentorshipController extends Controller
             ->latest()
             ->get();
 
+        $currentUserId = auth('api')->id();
+        $acceptedMentorIds = [];
+        if ($currentUserId) {
+            $acceptedMentorIds = MentorshipRequest::where('status', 'Accepted')
+                ->whereHas('student', function($q) use ($currentUserId) {
+                    $q->where('user_id', $currentUserId);
+                })
+                ->whereHas('listing', function($q) {
+                    $q->whereNotNull('alumni_id');
+                })
+                ->get()
+                ->pluck('listing.alumni_id')
+                ->toArray();
+        }
+
         // Map to a consistent "Mentor" object that the frontend expects
-        $mentors = $alumni->map(function($alumnus) {
+        $mentors = $alumni->map(function($alumnus) use ($acceptedMentorIds) {
             return [
-                'listing_id' => $alumnus->alumni_id, // Map alumni_id to listing_id for frontend compatibility
+                'listing_id' => $alumnus->alumni_id,
                 'alumni_id' => $alumnus->alumni_id,
                 'description' => $alumnus->user->profile->bio ?? "Hi! I'm an alumni willing to mentor students. Feel free to connect!",
-                'alumni' => $alumnus
+                'alumni' => $alumnus,
+                'is_connected' => in_array($alumnus->alumni_id, $acceptedMentorIds)
             ];
         });
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Briefcase, MapPin, GraduationCap, Link as LinkIcon, Mail, User, Info } from 'lucide-react';
+import { X, Briefcase, MapPin, GraduationCap, Link as LinkIcon, Mail, User, Info, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AlumniProfileModal = ({ alumni, isOpen, onClose }) => {
+    const navigate = useNavigate();
     if (!alumni) return null;
 
     const { first_name, last_name, bio, linkedin_url } = alumni.profile || {};

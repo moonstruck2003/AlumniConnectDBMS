@@ -165,7 +165,7 @@ function App() {
         <Route path="/mentorship/request/:id" element={<ProtectedRoute><MentorshipRequest /></ProtectedRoute>} />
         
         <Route path="/requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
-        <Route path="/conversations" element={<ProtectedRoute><Conversations /></ProtectedRoute>} />
+        <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/messages/:id" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/events" element={<Events />} />
       </Routes>
