@@ -27,14 +27,36 @@ import PostJob from './pages/PostJob';
 import ManageJobs from './pages/ManageJobs';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import dashboardService from './services/dashboardService';
+import { Users, GraduationCap, Briefcase, Calendar } from 'lucide-react';
 
 function Home() {
-  const stats = [
-    { label: "Total Alumni", value: "12,450", growth: "+5.2%", icon: "Users" },
-    { label: "Active Mentors", value: "842", growth: "+12.4%", icon: "Mentors" },
-    { label: "Job Postings", value: "156", growth: "+8.1%", icon: "Jobs" },
-    { label: "Upcoming Events", value: "23", growth: "+3.5%", icon: "Events" }
-  ];
+  const [stats, setStats] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const realStats = await dashboardService.getStats();
+        // Map the backend icons back to the string labels the local StatCard expects 
+        // OR map them to components if StatCard expects components.
+        // Looking at old code: icon: "Users", "Mentors", "Jobs", "Events"
+        const mappedStats = realStats.map(stat => {
+            let localIcon = "Users";
+            if (stat.label.includes("Mentor")) localIcon = "Mentors";
+            if (stat.label.includes("Job")) localIcon = "Jobs";
+            if (stat.label.includes("Event")) localIcon = "Events";
+            return { ...stat, icon: localIcon };
+        });
+        setStats(mappedStats);
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -60,7 +82,14 @@ function Home() {
         >
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((item, index) => <StatCard key={index} {...item} />)}
+            {loading ? (
+                /* Loading skeletons matching StatCard shape roughly */
+                [1,2,3,4].map(i => (
+                    <div key={i} className="h-32 bg-slate-900 animate-pulse rounded-[2rem] border border-slate-800" />
+                ))
+            ) : (
+                stats.map((item, index) => <StatCard key={index} {...item} />)
+            )}
           </div>
  
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -145,6 +174,7 @@ function Home() {
     </div>
   );
 }
+
 
 function App() {
   return (

@@ -14,15 +14,40 @@ import {
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Card from '../components/Card';
-import userService from '../services/userService';
+import dashboardService from '../services/dashboardService';
 
 const Dashboard = () => {
-  const [stats, setStats] = useState([
-    { label: "Total Alumni", value: "12,450", growth: "+5.2%", icon: Users, color: "text-blue-400" },
-    { label: "Active Mentors", value: "842", growth: "+12.4%", icon: GraduationCap, color: "text-amber-500" },
-    { label: "Job Postings", value: "156", growth: "+8.1%", icon: Briefcase, color: "text-emerald-400" },
-    { label: "Upcoming Events", value: "23", growth: "+3.5%", icon: Calendar, color: "text-indigo-400" }
-  ]);
+  const [stats, setStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const realStats = await dashboardService.getStats();
+        
+        // Map icons back because they are components in the frontend
+        const iconMap = {
+          'Users': Users,
+          'GraduationCap': GraduationCap,
+          'Briefcase': Briefcase,
+          'Calendar': Calendar
+        };
+
+        const mappedStats = realStats.map(stat => ({
+          ...stat,
+          icon: iconMap[stat.icon] || Users
+        }));
+
+        setStats(mappedStats);
+      } catch (error) {
+        console.error("Failed to fetch real dashboard data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -58,32 +83,47 @@ const Dashboard = () => {
             animate="visible"
             className="flex flex-col gap-10"
           >
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {stats.map((item, index) => {
-                const Icon = item.icon;
-                return (
-                  <Card key={index} className="!p-8 !bg-slate-900/60 transition-all hover:border-white/10 group cursor-pointer shadow-2xl relative overflow-hidden">
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i} className="!p-8 !bg-slate-900/60 animate-pulse h-40">
                     <div className="flex justify-between items-start mb-6">
-                      <div className={`p-4 rounded-2xl bg-slate-950 border border-slate-800 transition-colors group-hover:border-white/20 ${item.color}`}>
-                        <Icon size={24} className="group-hover:rotate-12 transition-transform duration-500" />
-                      </div>
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                        <TrendingUp size={12} className="text-emerald-400" />
-                        <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest leading-none">{item.growth}</span>
-                      </div>
+                      <div className="w-12 h-12 bg-slate-800 rounded-2xl" />
+                      <div className="w-16 h-6 bg-slate-800 rounded-lg" />
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1.5">{item.label}</span>
-                      <span className="text-4xl font-black text-white tracking-widest transition-all group-hover:scale-105 group-hover:translate-x-1 origin-left">{item.value}</span>
-                    </div>
-                    <div className="absolute -right-6 -bottom-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700 pointer-events-none">
-                       <Icon size={120} />
-                    </div>
+                    <div className="w-24 h-4 bg-slate-800 rounded mb-2" />
+                    <div className="w-32 h-8 bg-slate-800 rounded" />
                   </Card>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            ) : (
+              /* Stats Grid */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {stats.map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <Card key={index} className="!p-8 !bg-slate-900/60 transition-all hover:border-white/10 group cursor-pointer shadow-2xl relative overflow-hidden">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className={`p-4 rounded-2xl bg-slate-950 border border-slate-800 transition-colors group-hover:border-white/20 ${item.color}`}>
+                          <Icon size={24} className="group-hover:rotate-12 transition-transform duration-500" />
+                        </div>
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                          <TrendingUp size={12} className="text-emerald-400" />
+                          <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest leading-none">{item.growth}</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1.5">{item.label}</span>
+                        <span className="text-4xl font-black text-white tracking-widest transition-all group-hover:scale-105 group-hover:translate-x-1 origin-left">{item.value}</span>
+                      </div>
+                      <div className="absolute -right-6 -bottom-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700 pointer-events-none">
+                         <Icon size={120} />
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Middle Section */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">

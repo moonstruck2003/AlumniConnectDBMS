@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\MentorshipController;
 use App\Http\Controllers\Api\AlumniController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\Api\DashboardController;
 
 use App\Http\Controllers\Api\PasswordResetController;
 
@@ -54,4 +55,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/messages/conversations', [MessageController::class, 'getConversations']);
     Route::get('/messages/{userId}', [MessageController::class, 'getConversation']);
     Route::post('/messages', [MessageController::class, 'sendMessage']);
+
+    // Dashboard Routes
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
+    Route::get('/dashboard/activities', [DashboardController::class, 'getActivities']);
 });

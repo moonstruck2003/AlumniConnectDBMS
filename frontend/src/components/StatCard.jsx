@@ -10,6 +10,8 @@ export default function StatCard({ label, value, growth, icon }) {
 
   return (
     <motion.div 
+      initial="hidden"
+      animate="visible"
       variants={{
         hidden: { opacity: 0, scale: 0.95, y: 20 },
         visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
