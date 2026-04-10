@@ -25,6 +25,8 @@ import Conversations from './pages/Conversations';
 import Messages from './pages/Messages';
 import PostJob from './pages/PostJob';
 import ManageJobs from './pages/ManageJobs';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function Home() {
   const stats = [
@@ -152,6 +154,8 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/alumni" element={<AlumniDirectory />} />
         

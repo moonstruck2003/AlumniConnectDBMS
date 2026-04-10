@@ -10,9 +10,13 @@ use App\Http\Controllers\Api\AlumniController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MessageController;
 
+use App\Http\Controllers\Api\PasswordResetController;
+
 // Public routes
 Route::post('/signup', [UserController::class, 'store']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 Route::get('/alumni', [AlumniController::class, 'index']);
 Route::get('/alumni/{id}', [AlumniController::class, 'show'])->whereNumber('id');
 
