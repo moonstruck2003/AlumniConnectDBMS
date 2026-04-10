@@ -16,7 +16,9 @@ const MentorCard = ({
     expertise = [], 
     description,
     isStudent,
-    onRequested
+    onRequested,
+    isConnected,
+    userId
 }) => {
     const [isRequesting, setIsRequesting] = useState(false);
     const [message, setMessage] = useState('');
@@ -90,7 +92,15 @@ const MentorCard = ({
             
             <div className="relative z-10 w-full pt-4 border-t border-slate-800/50 mt-auto">
                 <AnimatePresence mode="wait">
-                    {!isRequesting ? (
+                    {isConnected ? (
+                        <Link 
+                            to={`/messages/${userId}`}
+                            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-2"
+                        >
+                            <MessageSquare size={14} /> 
+                            Chat Now
+                        </Link>
+                    ) : !isRequesting ? (
                         <motion.button 
                             key="request-btn"
                             initial={{ opacity: 0 }}

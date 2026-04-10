@@ -13,6 +13,7 @@ export default function Navbar({ user: propUser }) {
     { name: 'Mentorship', path: '/mentorship' },
     { name: 'Jobs', path: '/jobs' },
     { name: 'Events', path: '/events' },
+    { name: 'Messages', path: '/messages' },
     ...(user?.role?.toLowerCase() === 'recruiter' ? [{ name: 'Manage Postings', path: '/manage-jobs' }] : [])
   ];
 

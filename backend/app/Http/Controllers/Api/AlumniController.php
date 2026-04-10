@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\MentorshipRequest;
 use Illuminate\Http\Request;
 
 class AlumniController extends Controller
@@ -20,8 +21,28 @@ class AlumniController extends Controller
             ->with(['profile', 'alumni'])
             ->get();
 
+        $currentUserId = auth('api')->id();
+        $acceptedAlumniIds = [];
+        if ($currentUserId) {
+             $acceptedAlumniIds = MentorshipRequest::where('status', 'Accepted')
+                ->whereHas('student', function($q) use ($currentUserId) {
+                    $q->where('user_id', $currentUserId);
+                })
+                ->whereHas('listing', function($q) {
+                    $q->whereNotNull('alumni_id');
+                })
+                ->get()
+                ->pluck('listing.alumni_id')
+                ->toArray();
+        }
+
+        $alumniWithConnection = $alumni->map(function($user) use ($acceptedAlumniIds) {
+            $user->can_message = in_array($user->alumni?->alumni_id, $acceptedAlumniIds);
+            return $user;
+        });
+
         return response()->json([
-            'alumni' => $alumni
+            'alumni' => $alumniWithConnection
         ], 200);
     }
 

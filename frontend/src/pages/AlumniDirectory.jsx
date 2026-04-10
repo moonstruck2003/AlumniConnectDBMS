@@ -32,7 +32,8 @@ const AlumniDirectory = () => {
                     industry: item.alumni?.is_accepting_mentee ? 'Mentors' : 'Technology', // In a real app, this would be a field
                     profile: item.profile,
                     alumni: item.alumni,
-                    email: item.email
+                    email: item.email,
+                    canMessage: item.can_message
                 }));
 
                 const defaultAlumni = [
