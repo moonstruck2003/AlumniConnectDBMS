@@ -9,6 +9,8 @@ use App\Models\Recruiter;
 use App\Models\JobApplication;
 use App\Models\Student;
 use App\Models\Alumni;
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -300,6 +302,18 @@ class JobController extends Controller
             'applied_at' => now(),
         ]);
 
+        // Notify Recruiter
+        if ($job->recruiter) {
+            Notification::create([
+                'user_id' => $job->recruiter->user_id,
+                'sender_id' => $user->user_id,
+                'type' => 'job_application',
+                'title' => 'New Job Application',
+                'message' => ($user->profile->first_name ?? 'A candidate') . " applied for your posting: " . $job->job_title,
+                'link' => '/manage-jobs',
+            ]);
+        }
+
         return response()->json([
             'message' => 'Application submitted successfully!',
             'application' => $application
@@ -358,6 +372,19 @@ class JobController extends Controller
 
         $application->status = $request->status;
         $application->save();
+
+        // Notify Applicant
+        $applicantUserId = $application->student->user_id ?? $application->alumni->user_id ?? null;
+        if ($applicantUserId) {
+            Notification::create([
+                'user_id' => $applicantUserId,
+                'sender_id' => $user->user_id,
+                'type' => 'job_application',
+                'title' => 'Application Status Updated',
+                'message' => "Your application for " . $job->job_title . " has been " . strtolower($request->status) . ".",
+                'link' => '/jobs',
+            ]);
+        }
 
         return response()->json([
             'message' => "Application status updated to {$request->status}",
