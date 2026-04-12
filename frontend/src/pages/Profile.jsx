@@ -169,7 +169,9 @@ const Profile = () => {
                      </div>
                      <div className="flex flex-col items-start px-4 border-l border-white/5">
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none mb-2">Status</span>
-                        <span className="text-xl font-black text-white">Verified</span>
+                        <span className={`text-xl font-black ${user?.is_verified ? 'text-emerald-500' : 'text-amber-500'}`}>
+                          {user?.is_verified ? 'Verified' : 'Pending'}
+                        </span>
                      </div>
                   </div>
                </div>
@@ -246,7 +248,9 @@ const Profile = () => {
                     ) : (
                       <div className="flex flex-col">
                         <span className="text-xl font-bold text-slate-200">{user?.profile?.first_name} {user?.profile?.last_name}</span>
-                        <span className="text-xs text-slate-500 mt-1">Verified Account Holder</span>
+                        <span className={`text-[10px] font-black uppercase tracking-widest mt-1 ${user?.is_verified ? 'text-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'text-amber-500/80'}`}>
+                           {user?.is_verified ? '✓ Verified Identity' : '⚠ Verification Pending'}
+                        </span>
                       </div>
                     )}
                  </section>

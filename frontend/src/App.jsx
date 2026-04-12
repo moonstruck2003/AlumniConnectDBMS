@@ -28,6 +28,9 @@ import ManageJobs from './pages/ManageJobs';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import dashboardService from './services/dashboardService';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminProtectedRoute from './components/AdminProtectedRoute';
 import { Users, GraduationCap, Briefcase, Calendar } from 'lucide-react';
 
 function Home() {
@@ -202,6 +205,14 @@ function App() {
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/messages/:id" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/events" element={<Events />} />
+        
+        {/* Admin System */}
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={
+          <AdminProtectedRoute>
+            <AdminDashboard />
+          </AdminProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );
