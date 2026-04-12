@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Event;
+use App\Models\User;
+use App\Models\Notification;
 
 class EventController extends Controller
 {
@@ -34,6 +36,19 @@ class EventController extends Controller
             'image' => $validated['image'] ?? 'https://images.unsplash.com/photo-1511578334221-6f6f3d24d94b?auto=format&fit=crop&q=80&w=800',
             'featured' => false
         ]);
+
+        // Notify all users EXCEPT the creator about the new event
+        $users = User::where('user_id', '!=', auth()->id())->get();
+        foreach ($users as $user) {
+            Notification::create([
+                'user_id' => $user->user_id,
+                'sender_id' => auth()->id(),
+                'type' => 'event',
+                'title' => 'New Event: ' . $event->title,
+                'message' => "A new event '" . $event->title . "' has been scheduled for " . $event->date . ".",
+                'link' => '/events',
+            ]);
+        }
 
         return response()->json($event, 201);
     }

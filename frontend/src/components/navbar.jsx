@@ -1,11 +1,49 @@
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, UserCircle, Bell } from 'lucide-react';
 import authService from '../services/authService';
+import notificationService from '../services/notificationService';
+import NotificationDropdown from './NotificationDropdown';
 
 export default function Navbar({ user: propUser }) {
   const location = useLocation();
   const user = propUser || authService.getCurrentUser();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    fetchUnreadCount();
+    
+    // Set up polling for notifications
+    const intervalId = setInterval(() => {
+      fetchUnreadCount();
+    }, 15000); // 15 seconds
+    
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const data = await notificationService.getUnreadCount();
+      if (data && data.success) {
+        setUnreadCount(data.count);
+      }
+    } catch (error) {
+      console.error('Failed to fetch unread count', error);
+    }
+  };
 
   const navLinks = [
     { name: 'Dashboard', path: '/dashboard' },
@@ -61,10 +99,36 @@ export default function Navbar({ user: propUser }) {
 
         {/* Right Actions */}
         <div className="flex items-center gap-6">
-          <button className="text-slate-400 hover:text-amber-400 transition-transform hover:scale-110 relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full border-2 border-slate-950"></span>
-          </button>
+          <div className="relative" ref={dropdownRef}>
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="text-slate-400 hover:text-amber-400 transition-transform hover:scale-110 relative"
+            >
+              <Bell className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-slate-950 flex items-center justify-center text-[8px] font-bold text-white">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+            
+            <AnimatePresence>
+              {showNotifications && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2"
+                >
+                  <NotificationDropdown 
+                    onClose={() => setShowNotifications(false)} 
+                    onRefreshCount={fetchUnreadCount} 
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           
           <div className="hidden sm:flex items-center gap-4 pl-6 border-l border-slate-800">
             <div className="text-right">
