@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\AlumniController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\NotificationController;
 
 use App\Http\Controllers\Api\PasswordResetController;
 
@@ -59,4 +60,12 @@ Route::middleware('auth:api')->group(function () {
     // Dashboard Routes
     Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
     Route::get('/dashboard/activities', [DashboardController::class, 'getActivities']);
+
+    // Notification Routes
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::get('/notifications/unread-counts-by-type', [NotificationController::class, 'unreadCountsByType']);
+    Route::patch('/notifications/type/{type}/read', [NotificationController::class, 'markTypeAsRead']);
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->whereNumber('id');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 });
