@@ -189,7 +189,7 @@ function Home() {
 
             <motion.div 
               variants={itemVariants}
-              className="p-8 bg-slate-900 border border-slate-800 rounded-[2rem] shadow-2xl relative overflow-hidden group"
+              className="p-8 bg-slate-900 border border-slate-800 rounded-[2rem] shadow-2xl relative overflow-hidden group h-fit self-start"
             >
                <div className="absolute -top-10 -right-10 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none">
                  <Zap className="w-64 h-64 text-blue-500" />
@@ -221,6 +221,18 @@ function Home() {
                     </div>
                     <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center group-hover/action:bg-blue-500/10 group-hover/action:border-blue-500/30 transition-colors">
                       <ArrowRight className="w-4 h-4 text-slate-500 group-hover/action:text-blue-400 group-hover/action:translate-x-0.5 transition-all" />
+                    </div>
+                  </motion.div>
+                </Link>
+
+                <Link to="/events">
+                  <motion.div whileHover={{ scale: 1.02 }} className="flex justify-between items-center p-5 rounded-2xl bg-slate-950 border border-slate-800 cursor-pointer group/action hover:border-purple-500/40 hover:bg-slate-900 transition-all shadow-lg">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-slate-200 group-hover/action:text-white transition-colors">Explore Events</span>
+                      <span className="text-xs text-slate-500 mt-1">Join the gathering</span>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center group-hover/action:bg-purple-500/10 group-hover/action:border-purple-500/30 transition-colors">
+                      <ArrowRight className="w-4 h-4 text-slate-500 group-hover/action:text-purple-400 group-hover/action:translate-x-0.5 transition-all" />
                     </div>
                   </motion.div>
                 </Link>
