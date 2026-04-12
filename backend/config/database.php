@@ -110,16 +110,17 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             // FORCE THESE SETTINGS REGARDLESS OF .ENV
-            'encrypt' => 'yes',
+            'encrypt' => env('DB_ENCRYPT', 'yes'),
             'odbc_datasource_name' => null,
             'options' => extension_loaded('pdo_sqlsrv') ? [
                 PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
                 PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE => true,
                 PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
+
             ] : [
                 PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
             ],
-            'trust_server_certificate' => true, 
+            'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', true), 
         ],
 
     ],

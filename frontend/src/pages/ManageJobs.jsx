@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Briefcase, 
   MapPin, 
@@ -14,9 +14,16 @@ import {
   Layout,
   ExternalLink,
   ChevronRight,
-  Trash2
+  Trash2,
+  Users,
+  Download,
+  Award,
+  MessageSquare,
+  FileText,
+  User as UserIcon
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import Modal from '../components/Modal';
 import jobService from '../services/jobService';
 import authService from '../services/authService';
 import Card from '../components/Card';
@@ -25,7 +32,12 @@ export default function ManageJobs() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [applicants, setApplicants] = useState([]);
+  const [loadingApplicants, setLoadingApplicants] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const user = authService.getCurrentUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMyJobs = async () => {
@@ -65,6 +77,39 @@ export default function ManageJobs() {
       console.error('Failed to delete job', err);
       alert('Failed to delete job. You may not have permission for this node.');
     }
+  };
+
+  const handleViewApplicants = async (job) => {
+    setSelectedJob(job);
+    setLoadingApplicants(true);
+    setIsModalOpen(true);
+    try {
+      const data = await jobService.getApplicants(job.job_id);
+      setApplicants(data);
+    } catch (err) {
+      console.error('Failed to fetch applicants', err);
+      alert('Failed to retrieve applicant dossiers.');
+    } finally {
+      setLoadingApplicants(false);
+    }
+  };
+
+  const handleUpdateStatus = async (appId, newStatus) => {
+    try {
+      await jobService.updateApplicationStatus(appId, newStatus);
+      setApplicants(prev => prev.map(a => a.application_id === appId ? { ...a, status: newStatus } : a));
+    } catch (err) {
+      console.error('Failed to update status', err);
+      alert('Status transmission failed.');
+    }
+  };
+
+  const handleMessage = (targetUserId) => {
+    if (!targetUserId) {
+      alert("Technical constraint: Could not identify target user sequence.");
+      return;
+    }
+    navigate(`/messages/${targetUserId}`);
   };
 
   const containerVariants = {
@@ -176,13 +221,20 @@ export default function ManageJobs() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 w-full md:w-auto md:pl-10">
+                 <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto md:pl-10">
+                   <button 
+                     onClick={() => handleViewApplicants(job)}
+                     className="w-full md:w-48 px-6 py-4 bg-white text-slate-950 hover:bg-blue-600 hover:text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl"
+                   >
+                     <Users size={16} />
+                     View Applicants
+                   </button>
                    <button 
                      onClick={() => handleDelete(job.job_id)}
-                     className="w-full md:w-16 h-16 bg-slate-950 hover:bg-rose-600 text-rose-500 hover:text-white border border-slate-800 hover:border-rose-500 rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center shadow-xl group/delete"
+                     className="w-full md:w-16 h-14 bg-slate-950 hover:bg-rose-600 text-rose-500 hover:text-white border border-slate-800 hover:border-rose-500 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center shadow-xl group/delete"
                      title="Delete Permanently"
                    >
-                      <Trash2 size={24} className="group-hover/delete:scale-110 transition-transform" />
+                      <Trash2 size={20} className="group-hover/delete:scale-110 transition-transform" />
                    </button>
                 </div>
               </motion.div>
@@ -190,6 +242,143 @@ export default function ManageJobs() {
           </motion.div>
         )}
       </main>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={selectedJob ? `Applicants for: ${selectedJob.job_title}` : "Applicant Dossier"}
+        size="xl"
+      >
+        <div className="min-h-[400px]">
+          {loadingApplicants ? (
+            <div className="flex justify-center py-20">
+               <div className="w-10 h-10 border-4 border-blue-500/10 border-t-blue-500 rounded-full animate-spin" />
+            </div>
+          ) : applicants.length === 0 ? (
+            <div className="py-20 text-center text-slate-500">
+               <div className="inline-flex w-16 h-16 bg-slate-900 rounded-2xl items-center justify-center border border-slate-800 mb-4">
+                  <Users size={24} className="opacity-20" />
+               </div>
+               <p className="text-[10px] font-black uppercase tracking-widest">No candidates have applied to this node yet.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-separate border-spacing-y-4">
+                <thead>
+                  <tr className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    <th className="px-6 pb-2">Candidate</th>
+                    <th className="px-6 pb-2 text-center">Documents</th>
+                    <th className="px-6 pb-2 text-center">Applied On</th>
+                    <th className="px-6 pb-2 text-center">Status</th>
+                    <th className="px-6 pb-2 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="mt-4">
+                  {applicants.map((app, index) => {
+                    const profile = app.student?.user?.profile || app.alumni?.user?.profile;
+                    const role = app.student ? "Student" : "Alumni";
+                    
+                    return (
+                      <motion.tr 
+                        key={app.application_id} 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.3 }}
+                        className="group/row"
+                      >
+                        <td className="px-6 py-4 bg-slate-950/50 rounded-l-3xl border-y border-l border-white/5 transition-colors group-hover/row:border-blue-500/30">
+                          <div className="flex items-center gap-4">
+                             <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-blue-500 border border-slate-800 shadow-inner group-hover/row:border-blue-500/40 transition-colors">
+                                <UserIcon size={18} />
+                             </div>
+                             <div>
+                                <p className="text-sm font-black text-white leading-none mb-1 uppercase tracking-tight">{profile?.first_name} {profile?.last_name}</p>
+                                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{app.student?.user?.email || app.alumni?.user?.email}</p>
+                                <span className="text-[8px] px-1.5 py-0.5 bg-slate-900 rounded-md text-slate-600 font-black uppercase mt-1 inline-block border border-white/5">{role}</span>
+                             </div>
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4 bg-slate-950/50 border-y border-white/5 transition-colors group-hover/row:border-blue-500/30 text-center">
+                           {app.cv_url ? (
+                             <a 
+                               href={app.cv_url} 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors text-[10px] font-black uppercase tracking-widest group/dl px-4 py-2 bg-emerald-500/5 rounded-xl border border-emerald-500/10 hover:border-emerald-500/30"
+                             >
+                               <Download size={14} className="group-hover/dl:scale-110 transition-transform" />
+                               Resume
+                             </a>
+                           ) : (
+                             <span className="text-slate-700 italic text-[9px]">No File</span>
+                           )}
+                        </td>
+
+                        <td className="px-6 py-4 bg-slate-950/50 border-y border-white/5 transition-colors group-hover/row:border-blue-500/30 text-center">
+                           <span className="text-[10px] text-slate-400 font-bold">{new Date(app.applied_at || app.created_at).toLocaleDateString()}</span>
+                        </td>
+
+                        <td className="px-6 py-4 bg-slate-950/50 border-y border-white/5 transition-colors group-hover/row:border-blue-500/30 text-center">
+                           <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] border transition-all duration-500 ${
+                             app.status === 'Shortlisted' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]' :
+                             app.status === 'Rejected' ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.15)]' :
+                             'bg-slate-900 text-slate-500 border-slate-800'
+                           }`}>
+                             {app.status}
+                           </span>
+                        </td>
+
+                        <td className="px-6 py-4 bg-slate-950/50 rounded-r-3xl border-y border-r border-white/5 transition-colors group-hover/row:border-blue-500/30 text-right">
+                           <div className="flex items-center justify-end gap-2 px-2">
+                              <button 
+                                onClick={() => handleUpdateStatus(app.application_id, 'Shortlisted')}
+                                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border shadow-inner ${
+                                  app.status === 'Shortlisted' 
+                                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.4)] scale-110' 
+                                  : 'bg-slate-900 text-slate-500 border-white/5 hover:border-emerald-500/50 hover:text-emerald-400'
+                                }`}
+                                title="Shortlist Candidate"
+                              >
+                                <Award size={18} />
+                              </button>
+                              <button 
+                                onClick={() => handleUpdateStatus(app.application_id, 'Rejected')}
+                                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border shadow-inner ${
+                                  app.status === 'Rejected' 
+                                  ? 'bg-rose-600 text-white border-rose-400 shadow-[0_0_20px_rgba(225,29,72,0.4)] scale-110' 
+                                  : 'bg-slate-900 text-slate-500 border-white/5 hover:border-rose-500/50 hover:text-rose-500'
+                                }`}
+                                title="Reject Candidate"
+                              >
+                                <XCircle size={18} />
+                              </button>
+                              <button 
+                                onClick={() => handleMessage(app.student?.user?.user_id || app.alumni?.user?.user_id)}
+                                className="w-10 h-10 rounded-xl bg-slate-900 text-slate-500 border border-white/5 hover:border-blue-500/50 hover:text-blue-400 hover:bg-blue-500/5 flex items-center justify-center transition-all ml-2 group/msg shadow-inner"
+                                title="Initiate Message"
+                              >
+                                <MessageSquare size={18} className="group-hover/msg:scale-110 transition-transform" />
+                              </button>
+                           </div>
+                        </td>
+                      </motion.tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        <div className="mt-8 pt-6 border-t border-white/5 flex justify-end">
+           <button 
+             onClick={() => setIsModalOpen(false)}
+             className="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all"
+           >
+             Close Node
+           </button>
+        </div>
+      </Modal>
     </div>
   );
 }

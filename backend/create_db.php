@@ -1,5 +1,5 @@
 <?php
-$serverName = "db";
+$serverName = "127.0.0.1";
 $connectionOptions = array(
     "Database" => "master",
     "Uid" => "sa",
