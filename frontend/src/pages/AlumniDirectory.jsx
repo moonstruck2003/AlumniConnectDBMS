@@ -33,7 +33,8 @@ const AlumniDirectory = () => {
                     profile: item.profile,
                     alumni: item.alumni,
                     email: item.email,
-                    canMessage: item.can_message
+                    canMessage: item.can_message,
+                    isVerified: !!item.is_verified
                 }));
 
                 const defaultAlumni = [

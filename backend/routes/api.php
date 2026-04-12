@@ -13,6 +13,9 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\NotificationController;
 
 use App\Http\Controllers\Api\PasswordResetController;
+use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\AdminUserController;
+use App\Http\Controllers\Api\AdminContentController;
 
 // Public routes
 Route::post('/signup', [UserController::class, 'store']);
@@ -21,6 +24,25 @@ Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkE
 Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 Route::get('/alumni', [AlumniController::class, 'index']);
 Route::get('/alumni/{id}', [AlumniController::class, 'show'])->whereNumber('id');
+
+// Admin Auth (Public)
+Route::post('/admin/login', [AdminAuthController::class, 'login']);
+
+// Admin Protected Routes
+Route::middleware('admin')->group(function () {
+    Route::get('/admin/users', [AdminUserController::class, 'listUsers']);
+    Route::patch('/admin/users/{id}/verify', [AdminUserController::class, 'toggleVerification'])->whereNumber('id');
+
+    // Admin Content Management
+    Route::get('/admin/jobs', [AdminContentController::class, 'listJobs']);
+    Route::delete('/admin/jobs/{id}', [AdminContentController::class, 'deleteJob'])->whereNumber('id');
+    
+    Route::get('/admin/events', [AdminContentController::class, 'listEvents']);
+    Route::delete('/admin/events/{id}', [AdminContentController::class, 'deleteEvent'])->whereNumber('id');
+    
+    Route::get('/admin/mentorships', [AdminContentController::class, 'listMentorships']);
+    Route::delete('/admin/mentorships/{id}', [AdminContentController::class, 'deleteMentorship'])->whereNumber('id');
+});
 
 // Protected (JWT Bearer)
 Route::middleware('auth:api')->group(function () {

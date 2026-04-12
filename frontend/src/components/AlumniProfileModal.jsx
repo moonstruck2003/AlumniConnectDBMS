@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Briefcase, MapPin, GraduationCap, Link as LinkIcon, Mail, User, Info, MessageSquare } from 'lucide-react';
+import { X, Briefcase, MapPin, GraduationCap, Link as LinkIcon, Mail, User, Info, MessageSquare, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const AlumniProfileModal = ({ alumni, isOpen, onClose }) => {
@@ -11,6 +11,7 @@ const AlumniProfileModal = ({ alumni, isOpen, onClose }) => {
     const { company, job_title } = alumni.alumni || {};
     const name = `${first_name || 'Alumni'} ${last_name || 'Member'}`;
     const initials = `${first_name?.[0] || 'A'}${last_name?.[0] || 'M'}`;
+    const isVerified = alumni.isVerified;
 
     return (
         <AnimatePresence>
@@ -52,9 +53,17 @@ const AlumniProfileModal = ({ alumni, isOpen, onClose }) => {
                                         {initials}
                                     </div>
                                 </div>
-                                <div className="pb-2">
-                                    <h2 className="text-3xl font-black text-white">{name}</h2>
-                                    <p className="text-blue-400 font-bold tracking-wide uppercase text-xs">{job_title || 'Professional'}</p>
+                                <div className="pb-2 flex-1">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className="text-3xl font-black text-white">{name}</h2>
+                                        {isVerified && (
+                                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                                                <ShieldCheck className="w-3.5 h-3.5" />
+                                                Verified Node
+                                            </div>
+                                        )}
+                                    </div>
+                                    <p className="text-blue-400 font-bold tracking-wide uppercase text-xs mt-1">{job_title || 'Professional'}</p>
                                 </div>
                             </div>
 
