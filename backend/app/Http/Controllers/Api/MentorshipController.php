@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MentorshipListing;
 use App\Models\MentorshipRequest;
 use App\Models\Alumni;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -92,6 +93,19 @@ class MentorshipController extends Controller
             'status' => 'Pending',
         ]);
 
+        // Notify the Alumni (Mentor)
+        $alumnus = Alumni::find($alumniId);
+        if ($alumnus) {
+            Notification::create([
+                'user_id' => $alumnus->user_id,
+                'sender_id' => $user->user_id,
+                'type' => 'mentorship',
+                'title' => 'New Mentorship Request',
+                'message' => ($user->profile->first_name ?? 'A student') . " requested mentorship from you.",
+                'link' => '/requests', // Assuming this is where alumni view incoming requests
+            ]);
+        }
+
         return response()->json([
             'message' => 'Mentorship request submitted successfully.',
             'request' => $mentorshipRequest
@@ -166,6 +180,16 @@ class MentorshipController extends Controller
 
         $mentorshipRequest->update([
             'status' => $request->status
+        ]);
+
+        // Notify the Student (Mentee)
+        Notification::create([
+            'user_id' => $mentorshipRequest->student->user_id,
+            'sender_id' => $user->user_id,
+            'type' => 'mentorship',
+            'title' => 'Mentorship Request Update',
+            'message' => "Your mentorship request has been " . strtolower($request->status) . ".",
+            'link' => '/mentorship', // Assuming this is where students view their requests
         ]);
 
         return response()->json([

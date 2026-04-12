@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use App\Models\MentorshipRequest;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -98,6 +99,15 @@ class MessageController extends Controller
             'receiver_id' => $request->receiver_id,
             'content' => $request->content,
             'is_read' => false,
+        ]);
+
+        Notification::create([
+            'user_id' => $request->receiver_id,
+            'sender_id' => auth()->id(),
+            'type' => 'message',
+            'title' => 'New Message',
+            'message' => auth()->user()->name . ' sent you a message.',
+            'link' => '/messages',
         ]);
 
         return response()->json($message, 201);

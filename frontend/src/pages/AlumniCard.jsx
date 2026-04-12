@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Briefcase, MapPin, GraduationCap } from 'lucide-react';
+import { Briefcase, MapPin, GraduationCap, ShieldCheck } from 'lucide-react';
 
-const AlumniCard = ({ id, initials, name, title, company, location, year, isMentor, onViewProfile }) => {
+const AlumniCard = ({ id, initials, name, title, company, location, year, isMentor, isVerified, onViewProfile }) => {
     return (
         <motion.div 
             whileHover={{ y: -6, scale: 1.02 }}
@@ -15,11 +15,19 @@ const AlumniCard = ({ id, initials, name, title, company, location, year, isMent
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center border border-slate-700/50 shadow-inner group-hover:border-blue-500/30 transition-colors">
                     <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-white">{initials}</span>
                 </div>
-                {isMentor && (
-                    <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full">
-                        Mentor
-                    </div>
-                )}
+                <div className="flex flex-col gap-2 items-end">
+                    {isVerified && (
+                        <div className="px-3 py-1 text-[9px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            Verified
+                        </div>
+                    )}
+                    {isMentor && (
+                        <div className="px-3 py-1 text-[9px] font-black uppercase tracking-widest text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full">
+                            Mentor
+                        </div>
+                    )}
+                </div>
             </div>
             
             <div className="relative z-10 flex-1">
