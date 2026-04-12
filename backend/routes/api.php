@@ -39,6 +39,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/jobs/my-jobs', [JobController::class, 'myJobs']);
     Route::post('/jobs/{id}/toggle', [JobController::class, 'toggleStatus'])->whereNumber('id');
     Route::delete('/jobs/{id}', [JobController::class, 'destroy'])->whereNumber('id');
+    Route::post('/jobs/{id}/apply', [JobController::class, 'apply'])->whereNumber('id');
+    Route::get('/jobs/{id}/applicants', [JobController::class, 'getApplicants'])->whereNumber('id');
+    Route::post('/job-applications/{id}/status', [JobController::class, 'updateApplicationStatus'])->whereNumber('id');
 
     // Event Routes
     Route::get('/events', [EventController::class, 'index']);

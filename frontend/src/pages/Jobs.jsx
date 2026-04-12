@@ -31,6 +31,8 @@ export default function Jobs() {
   const [selectedType, setSelectedType] = useState('All');
   const [selectedJob, setSelectedJob] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cvFile, setCvFile] = useState(null);
+  const [applying, setApplying] = useState(false);
 
   const user = authService.getCurrentUser();
   const isRecruiter = user?.role === 'recruiter';
@@ -65,6 +67,29 @@ export default function Jobs() {
       setJobs(jobs.map(j => j.job_id === jobId ? { ...j, is_active: response.is_active } : j));
     } catch (err) {
       console.error('Failed to toggle job', err);
+    }
+  };
+
+  const handleApply = async () => {
+    if (!cvFile) {
+      alert("Please upload your CV (PDF/DOCX, max 3MB) to proceed.");
+      return;
+    }
+    
+    setApplying(true);
+    const formData = new FormData();
+    formData.append('cv', cvFile);
+
+    try {
+      await jobService.applyJob(selectedJob.job_id, formData);
+      setJobs(jobs.map(j => j.job_id === selectedJob.job_id ? { ...j, has_applied: true } : j));
+      setIsModalOpen(false);
+      setCvFile(null);
+    } catch (err) {
+      console.error('Application failed', err);
+      alert(err.response?.data?.message || 'Transmission failed. Ensure your file is under 3MB.');
+    } finally {
+      setApplying(false);
     }
   };
 
@@ -234,17 +259,37 @@ export default function Jobs() {
 
                     {/* Actions */}
                     <div className="flex flex-col items-center gap-4 w-full md:w-auto pt-8 md:pt-0 border-t md:border-t-0 border-slate-800/50 md:pl-10">
-                       <button 
-                         onClick={() => {
-                           setSelectedJob(job);
-                           setIsModalOpen(true);
-                         }}
-                         className="w-full md:w-48 px-12 py-5 bg-white text-slate-950 hover:bg-blue-600 hover:text-white rounded-[1.8rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl hover:shadow-blue-500/30 flex items-center justify-center gap-3"
-                       >
-                          Apply
-                          <ChevronRight className="w-4 h-4" />
-                       </button>
-
+                       {!isRecruiter ? (
+                         <button 
+                           onClick={() => {
+                             if (job.has_applied) return;
+                             setSelectedJob(job);
+                             setIsModalOpen(true);
+                           }}
+                           disabled={job.has_applied}
+                           className={`w-full md:w-48 px-12 py-5 rounded-[1.8rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl flex items-center justify-center gap-3 ${
+                             job.has_applied 
+                             ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 cursor-default' 
+                             : 'bg-white text-slate-950 hover:bg-blue-600 hover:text-white hover:shadow-blue-500/30'
+                           }`}
+                         >
+                            {job.has_applied ? (
+                              <>
+                                Applied
+                                <CheckCircle2 className="w-4 h-4" />
+                              </>
+                            ) : (
+                              <>
+                                Apply
+                                <ChevronRight className="w-4 h-4" />
+                              </>
+                            )}
+                         </button>
+                       ) : (
+                         <div className="px-8 py-4 bg-slate-900/50 border border-slate-800 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-500 italic">
+                           Recruiter View Only
+                         </div>
+                       )}
                     </div>
                   </motion.div>
                 ))}
@@ -263,37 +308,84 @@ export default function Jobs() {
               <div className="space-y-8">
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="w-16 h-16 rounded-2xl bg-blue-600/10 border border-blue-600/20 flex items-center justify-center">
-                    <Mail className="text-blue-400 w-8 h-8" />
+                    <Briefcase className="text-blue-400 w-8 h-8" />
                   </div>
                   <div>
-                    <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">Direct Contact Node</h4>
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Established secure connection</p>
+                    <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">{selectedJob.job_title}</h4>
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Application Sequence Initiated</p>
                   </div>
                 </div>
 
                 <div className="bg-slate-950/50 border border-slate-800 p-8 rounded-3xl relative overflow-hidden group/modal-card">
-                  <div className="relative z-10 text-center">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Target Endpoint</p>
-                    <a 
-                      href={`mailto:${selectedJob.contact_email}`}
-                      className="text-2xl font-black text-white hover:text-blue-400 transition-colors tracking-tighter block break-all"
-                    >
-                      {selectedJob.contact_email}
-                    </a>
+                  <div className="relative z-10">
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 text-center">Upload Professional Dossier (CV)</label>
+                    <div className="flex flex-col items-center gap-4">
+                      <input 
+                        type="file" 
+                        accept=".pdf,.doc,.docx"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file && file.size > 3 * 1024 * 1024) {
+                            alert("File size exceeds 3MB limit.");
+                            e.target.value = null;
+                            return;
+                          }
+                          setCvFile(file);
+                        }}
+                        className="hidden"
+                        id="cv-upload"
+                      />
+                      <label 
+                        htmlFor="cv-upload"
+                        className={`w-full py-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-3 transition-all cursor-pointer group/upload relative overflow-hidden ${
+                          cvFile 
+                          ? 'border-emerald-500/40 bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.05)]' 
+                          : 'border-slate-800 hover:border-blue-500/50 hover:bg-blue-500/5'
+                        }`}
+                      >
+                        {cvFile && (
+                          <motion.div 
+                            initial={{ x: '-100%' }}
+                            animate={{ x: '100%' }}
+                            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent pointer-events-none"
+                          />
+                        )}
+                        <Zap className={`w-8 h-8 relative z-10 transition-all ${cvFile ? 'text-emerald-400 animate-pulse' : 'text-slate-700 group-hover/upload:text-blue-400'}`} />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 relative z-10">
+                          {cvFile ? cvFile.name : 'Select PDF or Word Document'}
+                        </span>
+                        <span className="text-[9px] text-slate-700 font-bold italic relative z-10">Max size: 3MB</span>
+                      </label>
+                    </div>
                   </div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl -mr-16 -mt-16" />
                 </div>
 
-                <p className="text-slate-400 font-medium text-center text-sm leading-relaxed italic px-4">
-                  "Please initiate contact via the provided email. Your professional record will be buffered and stored upon transmission."
-                </p>
-
-                <div className="pt-4">
+                <div className="flex gap-4">
                   <button 
                     onClick={() => setIsModalOpen(false)}
-                    className="w-full py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/5"
+                    className="flex-1 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/5 active:scale-95 shadow-lg"
                   >
-                    Close Protocol
+                    Abort
+                  </button>
+                  <button 
+                    onClick={handleApply}
+                    disabled={applying || !cvFile}
+                    className={`flex-1 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 ${
+                      applying || !cvFile 
+                      ? 'bg-slate-800 text-slate-600 cursor-not-allowed border border-white/5' 
+                      : 'bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)]'
+                    }`}
+                  >
+                    {applying ? (
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Deploy Application
+                        <CheckCircle2 className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
