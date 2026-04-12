@@ -380,12 +380,20 @@ class JobController extends Controller
         // Notify Applicant
         $applicantUserId = $application->student->user_id ?? $application->alumni->user_id ?? null;
         if ($applicantUserId) {
+            $notifMessage = "Your application for " . $job->job_title . " has been " . strtolower($request->status) . ".";
+            $notifTitle = 'Application Status Updated';
+
+            if ($request->status === 'Offered') {
+                $notifTitle = '🎉 Congratulations!';
+                $notifMessage = "Congo! You got the job for " . $job->job_title . " at " . $job->company_name . ". We are thrilled for you!";
+            }
+
             Notification::create([
                 'user_id' => $applicantUserId,
                 'sender_id' => $user->user_id,
                 'type' => 'job_application',
-                'title' => 'Application Status Updated',
-                'message' => "Your application for " . $job->job_title . " has been " . strtolower($request->status) . ".",
+                'title' => $notifTitle,
+                'message' => $notifMessage,
                 'link' => '/jobs',
             ]);
         }

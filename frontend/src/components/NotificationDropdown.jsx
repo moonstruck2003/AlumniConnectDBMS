@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageSquare, Briefcase, Users, Bell, Calendar } from 'lucide-react';
+import { MessageSquare, Briefcase, Users, Bell, Calendar, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import notificationService from '../services/notificationService';
 import './NotificationDropdown.css';
@@ -53,6 +53,7 @@ export default function NotificationDropdown({ onClose, onRefreshCount }) {
       case 'job_application': return <Briefcase size={18} />;
       case 'mentorship': return <Users size={18} />;
       case 'event': return <Calendar size={18} />;
+      case 'system': return <ShieldCheck size={18} />;
       default: return <Bell size={18} />;
     }
   };

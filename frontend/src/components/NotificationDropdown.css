@@ -93,6 +93,7 @@
 .notif-icon.job_application { color: #f59e0b; }
 .notif-icon.mentorship { color: #10b981; }
 .notif-icon.event { color: #a855f7; }
+.notif-icon.system { color: #06b6d4; }
 
 .notif-content {
   flex: 1;
