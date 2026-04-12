@@ -66,8 +66,58 @@ class DashboardController extends Controller
      */
     public function getActivities()
     {
-        // For now returning empty array as requested to show "domain is silent" if no data
-        // but can be hooked to logs or recent table entries.
-        return response()->json([]);
+        try {
+            $activities = collect();
+
+            // 1. Get New Jobs
+            $jobs = JobListing::latest()->limit(2)->get();
+            foreach ($jobs as $job) {
+                $activities->push([
+                    'id' => 'job-' . $job->job_id,
+                    'type' => 'job',
+                    'title' => 'New Opportunity',
+                    'message' => "{$job->job_title} at {$job->company_name}",
+                    'created_at' => $job->created_at,
+                    'link' => '/jobs'
+                ]);
+            }
+
+            // 2. Get New Alumni
+            $newAlumni = User::where('role', 'alumni')
+                ->with('profile')
+                ->latest()
+                ->limit(2)
+                ->get();
+            foreach ($newAlumni as $user) {
+                $activities->push([
+                    'id' => 'user-' . $user->user_id,
+                    'type' => 'user',
+                    'title' => 'New Member Joined',
+                    'message' => "{$user->name} has joined the legacy.",
+                    'created_at' => $user->created_at,
+                    'link' => '/alumni'
+                ]);
+            }
+
+            // 3. Get Upcoming Events
+            $events = Event::latest()->limit(2)->get();
+            foreach ($events as $event) {
+                $activities->push([
+                    'id' => 'event-' . $event->id,
+                    'type' => 'event',
+                    'title' => 'Upcoming Event',
+                    'message' => "{$event->title} scheduled for {$event->date}",
+                    'created_at' => $event->created_at,
+                    'link' => '/events'
+                ]);
+            }
+
+            // Sort all by latest and take top 5
+            return response()->json(
+                $activities->sortByDesc('created_at')->values()->take(5)
+            );
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch dashboard activities', 'message' => $e->getMessage()], 500);
+        }
     }
 }

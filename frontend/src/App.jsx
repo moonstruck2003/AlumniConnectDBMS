@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Activity, Zap, ArrowRight, Home as HomeIcon } from 'lucide-react';
+import { Activity, Zap, ArrowRight, Home as HomeIcon, Globe, UserPlus, Briefcase, Calendar, Users, GraduationCap } from 'lucide-react';
 import './App.css';
 import Navbar from './components/Navbar';
 import Hero from './components/welcome';
@@ -31,19 +31,18 @@ import dashboardService from './services/dashboardService';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
-import { Users, GraduationCap, Briefcase, Calendar } from 'lucide-react';
+
 
 function Home() {
   const [stats, setStats] = React.useState([]);
+  const [activities, setActivities] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [loadingActivities, setLoadingActivities] = React.useState(true);
 
   React.useEffect(() => {
     const fetchStats = async () => {
       try {
         const realStats = await dashboardService.getStats();
-        // Map the backend icons back to the string labels the local StatCard expects 
-        // OR map them to components if StatCard expects components.
-        // Looking at old code: icon: "Users", "Mentors", "Jobs", "Events"
         const mappedStats = realStats.map(stat => {
             let localIcon = "Users";
             if (stat.label.includes("Mentor")) localIcon = "Mentors";
@@ -58,8 +57,31 @@ function Home() {
         setLoading(false);
       }
     };
+
+    const fetchActivities = async () => {
+      try {
+        const data = await dashboardService.getActivities();
+        setActivities(data);
+      } catch (error) {
+        console.error("Failed to fetch activities", error);
+      } finally {
+        setLoadingActivities(false);
+      }
+    };
+
     fetchStats();
+    fetchActivities();
   }, []);
+
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return date.toLocaleDateString();
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -103,18 +125,65 @@ function Home() {
               <div className="absolute -top-10 -right-10 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none">
                  <Activity className="w-64 h-64 text-amber-500" />
               </div>
-              <h4 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-white mb-8 border-b border-slate-800/60 pb-6">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                  <Activity className="w-5 h-5 text-amber-500 animate-pulse" />
+              <h4 className="flex items-center gap-3 text-2xl font-black uppercase text-white mb-8 border-b border-white/5 pb-6">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.1)]">
+                  <Globe className="w-5 h-5 text-amber-500 animate-pulse" />
                 </div>
                 Recent Activity
               </h4>
-              <div className="flex flex-col items-center justify-center py-16 px-4">
-                <div className="w-20 h-20 bg-slate-950 rounded-full flex items-center justify-center border border-slate-800 mb-6 shadow-inner">
-                  <Activity className="w-8 h-8 text-slate-700" />
-                </div>
-                <p className="text-lg text-slate-400 font-medium">Your network timeline is quiet.</p>
-                <p className="text-sm text-slate-500 mt-2">Connect with members to supercharge your feed.</p>
+              
+              <div className="flex flex-col gap-4 relative z-10">
+                {loadingActivities ? (
+                  [1, 2, 3].map(i => (
+                    <div key={i} className="flex items-center gap-5 p-5 bg-slate-950/40 rounded-2xl border border-white/5 animate-pulse">
+                      <div className="w-12 h-12 bg-slate-800 rounded-xl" />
+                      <div className="flex-1 space-y-2">
+                        <div className="w-24 h-4 bg-slate-800 rounded" />
+                        <div className="w-full h-3 bg-slate-800 rounded" />
+                      </div>
+                    </div>
+                  ))
+                ) : activities.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 px-4">
+                    <div className="w-20 h-20 bg-slate-950 rounded-full flex items-center justify-center border border-slate-800 mb-6 shadow-inner">
+                      <Activity className="w-8 h-8 text-slate-700" />
+                    </div>
+                    <p className="text-lg text-slate-400 font-medium">Your network timeline is quiet.</p>
+                    <p className="text-sm text-slate-500 mt-2">Connect with members to supercharge your feed.</p>
+                  </div>
+                ) : (
+                  activities.map((activity, index) => {
+                    const getIcon = () => {
+                      if (activity.type === 'job') return <Briefcase className="w-5 h-5 text-emerald-400" />;
+                      if (activity.type === 'user') return <UserPlus className="w-5 h-5 text-blue-400" />;
+                      if (activity.type === 'event') return <Calendar className="w-5 h-5 text-purple-400" />;
+                      return <Activity className="w-5 h-5 text-amber-500" />;
+                    };
+
+                    return (
+                      <motion.div 
+                        key={activity.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-center gap-5 p-5 hover:bg-white/5 rounded-2xl border border-transparent hover:border-white/10 transition-all group/item cursor-pointer"
+                        onClick={() => window.location.href = activity.link}
+                      >
+                         <div className="w-12 h-12 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center shadow-inner group-hover/item:border-white/20 transition-colors">
+                           {getIcon()}
+                         </div>
+                         <div className="flex-1 min-w-0">
+                           <div className="flex items-center justify-between mb-0.5">
+                             <h5 className="text-[11px] font-black text-white uppercase tracking-wider truncate">{activity.title}</h5>
+                             <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest leading-none">{formatTime(activity.created_at)}</span>
+                           </div>
+                           <p className="text-[13px] font-bold text-slate-400 truncate tracking-tight">{activity.message}</p>
+                         </div>
+                         <ArrowRight className="w-4 h-4 text-slate-700 group-hover/item:text-white transition-colors group-hover/item:translate-x-0.5" />
+                      </motion.div>
+                    );
+                  })
+                )}
               </div>
             </motion.div>
 
