@@ -80,7 +80,9 @@ class JobController extends Controller
                         $query->where('alumni_id', $alumni->alumni_id);
                     }
 
-                    $job->has_applied = $query->exists();
+                    $app = $query->first();
+                    $job->has_applied = (bool)$app;
+                    $job->application_status = $app ? $app->status : null;
                 });
             } else {
                 // If user is authenticated as student/alumni but has no profile record yet
@@ -236,7 +238,9 @@ class JobController extends Controller
                 if ($alumni)
                     $query->where('alumni_id', $alumni->alumni_id);
             }
-            $hasApplied = $query->exists();
+            $app = $query->first();
+            $hasApplied = (bool)$app;
+            $job->application_status = $app ? $app->status : null;
         }
 
         $job->has_applied = $hasApplied;

@@ -269,14 +269,23 @@ export default function Jobs() {
                            disabled={job.has_applied}
                            className={`w-full md:w-48 px-12 py-5 rounded-[1.8rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl flex items-center justify-center gap-3 ${
                              job.has_applied 
-                             ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 cursor-default' 
+                             ? job.application_status === 'Shortlisted'
+                               ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 cursor-default'
+                               : job.application_status === 'Rejected'
+                               ? 'bg-rose-600/20 text-rose-400 border border-rose-500/30 cursor-default'
+                               : job.application_status === 'Offered'
+                               ? 'bg-amber-600/20 text-amber-400 border border-amber-500/30 cursor-default shadow-[0_0_20px_rgba(251,191,36,0.1)]'
+                               : 'bg-slate-800/20 text-slate-400 border border-slate-700/50 cursor-default'
                              : 'bg-white text-slate-950 hover:bg-blue-600 hover:text-white hover:shadow-blue-500/30'
                            }`}
                          >
                             {job.has_applied ? (
                               <>
-                                Applied
-                                <CheckCircle2 className="w-4 h-4" />
+                                {job.application_status || 'Applied'}
+                                {job.application_status === 'Shortlisted' && <CheckCircle2 className="w-4 h-4" />}
+                                {job.application_status === 'Rejected' && <XCircle className="w-4 h-4" />}
+                                {job.application_status === 'Offered' && <Zap className="w-4 h-4 animate-pulse" />}
+                                {(!job.application_status || job.application_status === 'Pending') && <Clock className="w-4 h-4" />}
                               </>
                             ) : (
                               <>
