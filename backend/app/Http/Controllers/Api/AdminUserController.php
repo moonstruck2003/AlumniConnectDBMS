@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class AdminUserController extends Controller
@@ -34,6 +35,17 @@ class AdminUserController extends Controller
         $user->save();
 
         $action = $user->is_verified ? 'verified' : 'revoked verification for';
+
+        if ($user->is_verified) {
+            Notification::create([
+                'user_id' => $user->user_id,
+                'sender_id' => auth()->id(),
+                'type' => 'system',
+                'title' => 'Verification Success ✅',
+                'message' => 'Congratulations! Your account has been verified by the administration.',
+                'link' => '/profile',
+            ]);
+        }
 
         return response()->json([
             'message' => "Successfully {$action} user",
